@@ -1,7 +1,7 @@
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { getUserData } from "./_data-access/get-info-user";
-import { ProfileContent } from "./_components/profiles";
+import { ProfileContent } from "./_components/profile";
 
 export default async function Profile() {
   //valida se a sessão esta logada
@@ -12,10 +12,15 @@ export default async function Profile() {
 
   const user = await getUserData({ userId: session.user?.id });
 
-  console.log("getuer", user);
+  //console.log("getuer", user);
+
+  if (!user) {
+    redirect("/");
+  }
+
   return (
     <div>
-      <ProfileContent />
+      <ProfileContent user={user} />
     </div>
   );
 }
