@@ -83,7 +83,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
     setSelectedTime((prevSelectedTime) =>
       prevSelectedTime.includes(time)
         ? prevSelectedTime.filter((t) => t !== time)
-        : [...prevSelectedTime, time].sort()
+        : [...prevSelectedTime, time].sort(),
     );
   }
   const timeZones = Intl.supportedValuesOf("timeZone").filter(
@@ -95,7 +95,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
       zone.startsWith("America/Belem") ||
       zone.startsWith("America/Cuiaba") ||
       zone.startsWith("America/Porto_Velho") ||
-      zone.startsWith("America/Manaus")
+      zone.startsWith("America/Manaus"),
   );
 
   const form = useProfileForm({
@@ -257,9 +257,9 @@ export function ProfileContent({ user }: ProfileContentProps) {
                       <DialogHeader>
                         <DialogTitle>Horário da clínica</DialogTitle>
                         <DialogDescription>
-                          <p>
+                          <Label className="font-semibold">
                             Selecione o horário de funcionamento da clínica.
-                          </p>
+                          </Label>
                         </DialogDescription>
                       </DialogHeader>
                       <section className="mt-4 space-y-4 max-h-80 overflow-y-auto">
@@ -271,7 +271,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                               className={cn(
                                 "h-10",
                                 selectedTime.includes(time) &&
-                                  "border-2 border-blue-500 text-primary"
+                                  "border-2 border-blue-500 text-primary",
                               )}
                               onClick={() => toggleTimeSelection(time)}
                             >

@@ -23,7 +23,6 @@ export async function getAllServices({ userId }: { userId: string }) {
 
     return { data: services };
   } catch (err) {
-    console.log("Erro ao buscar os serviços:", err);
     return { error: "Erro ao buscar os serviços" };
   }
 }

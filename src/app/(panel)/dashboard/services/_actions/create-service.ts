@@ -38,7 +38,6 @@ export async function createServiceAction(formData: formShema) {
 
     return { service: newService };
   } catch (err) {
-    console.log("Erro ao criar o serviço:", err);
     return { error: "Erro ao criar o serviço" };
   }
 }

@@ -33,7 +33,6 @@ export async function deleteServiceAction(formData: formShema) {
     revalidatePath("/dashboard/services");
     return { data: "Serviço deletado com sucesso" };
   } catch (err) {
-    console.log("Erro ao deletar o serviço:", err);
     return { error: "Erro ao deletar o serviço" };
   }
 }

@@ -51,7 +51,15 @@ export function ServicesList({ services }: ServicesListProps) {
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        setIsDialogOpen(open);
+        if (!open) {
+          setEditingService(null);
+        }
+      }}
+    >
       <section className="mx-auto">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pg-2">
@@ -83,7 +91,7 @@ export function ServicesList({ services }: ServicesListProps) {
                         name: editingService.name,
                         price: formatvalue(editingService.price.toString()),
                         hours: Math.floor(
-                          editingService.duration / 60
+                          editingService.duration / 60,
                         ).toString(),
                         minutes: (editingService.duration % 60).toString(),
                       }

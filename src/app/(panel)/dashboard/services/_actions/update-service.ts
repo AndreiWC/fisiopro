@@ -14,7 +14,7 @@ const formShema = z.object({
 type formShema = z.infer<typeof formShema>;
 
 export async function updateServiceAction(
-  formData: formShema & { serviceId: string }
+  formData: formShema & { serviceId: string },
 ) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -41,7 +41,6 @@ export async function updateServiceAction(
 
     return { data: "Serviço atualizado com sucesso" };
   } catch (err) {
-    console.log("Erro ao atualizar o serviço:", err);
     return { error: "Erro ao atualizar o serviço" };
   }
 }

@@ -46,7 +46,6 @@ export async function updateProfileAction(formData: formShema) {
       data: "Perfil atualizado com sucesso",
     };
   } catch (err) {
-    console.log("Erro ao atualizar o perfil:", err);
     return { error: "Erro ao atualizar o perfil" };
   }
 }

@@ -12,8 +12,6 @@ export default async function Profile() {
 
   const user = await getUserData({ userId: session.user?.id });
 
-  //console.log("getuer", user);
-
   if (!user) {
     redirect("/");
   }
