@@ -83,27 +83,34 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (selectedDate) {
       fetchBlockedTimes(selectedDate).then((blocked) => {
         setBlockTimes(blocked);
-        const times = clinic.times || [];
-        const finalSlots = times.map((time) => ({
-          time: time,
-          available: !blocked.includes(time),
-        }));
-
-        setAvailableTimeSlots(finalSlots);
-
-        const stillAvailable = finalSlots.find(
-          (slot) => slot.time === selectedTime && slot.available,
-        );
-        if (!stillAvailable) {
-          setSelectedTime("");
-          setValue("time", "", { shouldValidate: true });
-        }
       });
     }
-  }, [selectedDate, clinic.times, fetchBlockedTimes, selectedTime]);
+  }, [selectedDate, fetchBlockedTimes]);
+
+  useEffect(() => {
+    const times = clinic.times || [];
+    const finalSlots = times.map((time) => ({
+      time: time,
+      available: !blockTimes.includes(time),
+    }));
+
+    setAvailableTimeSlots(finalSlots);
+
+    const stillAvailable = finalSlots.find(
+      (slot) => slot.time === selectedTime && slot.available,
+    );
+
+    if (selectedTime && !stillAvailable) {
+      setSelectedTime("");
+      setValue("time", "", { shouldValidate: true });
+    }
+  }, [blockTimes, clinic.times, selectedTime, setValue]);
 
   async function handleRegisterAppointmnent(formData: AppointmentFormData) {
     if (!selectedTime) {

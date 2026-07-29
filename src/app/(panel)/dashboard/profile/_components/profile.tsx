@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { formatPhone } from "@/utils/formatPhone";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { AvatarProfile } from "./profile-avatar";
 
 type UserWithSubscription = Prisma.UserGetPayload<{
   include: {
@@ -60,7 +61,7 @@ interface ProfileContentProps {
 }
 // função de gerar os horários de 30 em 30 minutos das 8h às 23:30h
 export function ProfileContent({ user }: ProfileContentProps) {
-  console.log("userprofile", user);
+ 
 
   function generateTimeSlote(): string[] {
     const timeSlots: string[] = [];
@@ -142,12 +143,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
             <CardContent className="space-6">
               <div className="flex justify-center">
                 <div className="bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden">
-                  <Image
-                    src={user.image ? user.image : imgTest} //troca de imagem pelo user.image
-                    alt="Foto clínica"
-                    fill
-                    className="object-cover"
-                  ></Image>
+                  <AvatarProfile avatarUrl={user.image} userId={user.id} />
                 </div>
               </div>
 

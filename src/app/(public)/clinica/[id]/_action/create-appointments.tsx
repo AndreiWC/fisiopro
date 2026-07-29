@@ -29,7 +29,7 @@ export async function createNewAppointment(formData: FormSchema) {
     const month = selectedDate.getMonth(); // Os meses são indexados a partir de 0
     const day = selectedDate.getDate();
 
-    const appointmentDate = new Date(year, month, day, 0, 0, 0, 0);
+    const appointmentDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0)); // Cria a data no formato UTC
     const newAppointment = await prisma.appointments.create({
       data: {
         name: formData.name,

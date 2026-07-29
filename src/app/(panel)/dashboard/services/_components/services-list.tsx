@@ -27,14 +27,21 @@ import { formatvalue } from "@/utils/formatValue";
 import { Pencil, Trash } from "lucide-react";
 import { deleteServiceAction } from "../_actions/delete-service";
 import { toast } from "sonner";
+import { ResultPermissionsProps } from "@/utils/permissions/canPermissions";
+import Link from "next/link";
 
 interface ServicesListProps {
   services: Service[];
+  permissions: ResultPermissionsProps;
 }
 
-export function ServicesList({ services }: ServicesListProps) {
+export function ServicesList({ services, permissions }: ServicesListProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<null | Service>(null);
+
+  const servicesList = permissions.hasPermission
+    ? services
+    : services.slice(0, permissions.plan?.maxServices || 3);
 
   async function handleDeleteService(serviceId: string) {
     const response = await deleteServiceAction({ serviceId: serviceId });
@@ -66,12 +73,21 @@ export function ServicesList({ services }: ServicesListProps) {
             <CardTitle className="text-xl md:text-3xl font-bold">
               Serviços
             </CardTitle>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-
+            {permissions.hasPermission && (
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+            )}
+            {!permissions.hasPermission && (
+              <Link
+                href="/dashboard/plans"
+                className="text-red-500 hover:underline"
+              >
+                Limite de serviços atingido
+              </Link>
+            )}
             <DialogContent
               onInteractOutside={(e) => {
                 e.preventDefault();
@@ -103,7 +119,7 @@ export function ServicesList({ services }: ServicesListProps) {
 
           <CardContent>
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {services.map((service) => (
+              {servicesList.map((service) => (
                 <article
                   key={service.id}
                   className="p-4 border rounded-xl bg-gray-50 hover:bg-gray-100 transition"

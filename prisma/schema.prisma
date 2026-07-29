@@ -80,7 +80,7 @@ model Service{
 
 enum Plan{
 	BASIC
-	PROFESSINAL
+	PROFESSIONAL
 }
 
 model Subscription{
