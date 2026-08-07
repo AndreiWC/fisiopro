@@ -22,9 +22,9 @@ export function Header() {
 
   const navItems = [{ href: "#profissionais", label: "Profissionais" }];
   async function handleLogin() {
-    await handleRegister("github");
+    await handleRegister("google");
   }
-
+ 
   const NavLinks = () => (
     <>
       {navItems.map((item) => (
