@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Inclui os arquivos da pasta de saída personalizada do Prisma no bundle da Vercel
+  outputFileTracingIncludes: {
+    "/**": ["./src/generated/prisma/**/*"],
+  },
 };
 
 export default nextConfig;
