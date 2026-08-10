@@ -3,7 +3,7 @@
 import Image from "next/image";
 import imgTest from "../../../../../../public/profissional.png";
 import { MapPin } from "lucide-react";
-import type { Prisma } from "@/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import { useAppointmentForm, AppointmentFormData } from "./schedule-form";
 import { Button } from "@/components/ui/button";
 import {

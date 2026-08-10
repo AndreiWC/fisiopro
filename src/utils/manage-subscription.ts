@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { stripe } from "@/utils/stripe";
 import Stripe from "stripe";
-import { Plan } from "@/generated/prisma/browser";
+import { Plan } from "@prisma/client";
 /**
  * Salvar atualizar ou deletar informações de assinatura do usuário no banco de dados.
  */

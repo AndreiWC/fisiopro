@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/utils/stripe";
 import Stripe from "stripe";
 import { manageSubscription } from "@/utils/manage-subscription";
-import { Plan } from "@/generated/prisma/browser";
+import { Plan } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 export const POST = async (request: Request) => {
   const signature = request.headers.get("stripe-signature");

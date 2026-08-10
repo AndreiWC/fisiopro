@@ -39,7 +39,7 @@ import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { set } from "zod";
 import { cn } from "@/lib/utils";
-import { Prisma } from "@/generated/prisma/client";
+import { Prisma } from "@prisma/client";
 import { updateProfileAction } from "../_actions/update-profile";
 import { toast } from "sonner";
 import { formatPhone } from "@/utils/formatPhone";

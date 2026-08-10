@@ -1,6 +1,6 @@
 "use server";
 
-import { Plan } from "@/generated/prisma/browser";
+import { Plan } from "@prisma/client";
 import { PlansProps } from "@/utils/plans/index";
 
 export interface PlanDetailsInfo {

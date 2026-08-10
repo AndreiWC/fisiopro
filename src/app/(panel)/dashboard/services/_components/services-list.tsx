@@ -22,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { DialogService } from "./dialog-service";
-import { Service } from "@/generated/prisma/client";
+import { Service } from "@prisma/client";
 import { formatvalue } from "@/utils/formatValue";
 import { Pencil, Trash } from "lucide-react";
 import { deleteServiceAction } from "../_actions/delete-service";

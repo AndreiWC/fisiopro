@@ -1,5 +1,5 @@
 "use client";
-import { Subscription } from "@/generated/prisma/browser";
+import type { Subscription } from "@prisma/client";
 import { toast } from "sonner";
 import { Check, Sparkles } from "lucide-react"; // Certifique-se de ter o lucide-react instalado
 import {

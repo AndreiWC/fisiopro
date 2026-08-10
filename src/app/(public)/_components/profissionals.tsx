@@ -11,7 +11,7 @@ import Image from "next/image";
 import fotoImg from "../../../../public/phaceholder 3.png";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Prisma } from "@/generated/prisma/client";
+import { Prisma } from "@prisma/client";
 import { PremiumBadge } from "./premium-badge";
 
 type UserWithSubscription = Prisma.UserGetPayload<{

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import type { Prisma } from "@/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { X, Eye } from "lucide-react";
 import { toast } from "sonner";

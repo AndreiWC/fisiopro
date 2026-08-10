@@ -1,5 +1,5 @@
 "use client";
-import { Plan } from "@/generated/prisma/browser";
+import { Plan } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { createSubscription } from "../_actions/create-subscription";
 import { toast } from "sonner";

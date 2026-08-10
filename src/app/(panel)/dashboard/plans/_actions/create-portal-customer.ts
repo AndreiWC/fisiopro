@@ -2,7 +2,7 @@
 import { auth } from "@/lib/auth";
 import { stripe } from "@/utils/stripe";
 import Prisma from "@/lib/prisma";
-import { Plan } from "@/generated/prisma/browser";
+import { Plan } from "@prisma/client";
 
 export async function createPortalCustomer() {
   const session = await auth();

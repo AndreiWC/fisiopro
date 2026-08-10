@@ -1,6 +1,6 @@
 "use server";
 
-import { Subscription } from "@/generated/prisma/client";
+import { Subscription } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { Session } from "next-auth";
 import { getPlan } from "./get-plans";
@@ -42,7 +42,6 @@ export async function canCreateService(
     //plano TRIAL
     const checkUserLimit = await checkSubscriptionExpired(session);
     return checkUserLimit;
-    
   } catch (err) {
     return {
       hasPermission: false,
