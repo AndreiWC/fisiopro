@@ -4,9 +4,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AppointmentWithService } from "./appointments-list";
+import { AppointmentWithService, STATUS_META } from "./appointments-list";
 import { format } from "date-fns";
 import { formatvalueToReal } from "@/utils/formatValue";
+import { cn } from "@/lib/utils";
 interface DialogAppointmentProps {
   appointment: AppointmentWithService;
 }
@@ -14,7 +15,17 @@ export function DialogAppointment({ appointment }: DialogAppointmentProps) {
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Detalhes do Agendamento</DialogTitle>
+        <div className="flex items-center gap-2">
+          <DialogTitle>Detalhes do Agendamento</DialogTitle>
+          <span
+            className={cn(
+              "rounded-full px-2 py-0.5 text-xs font-medium",
+              STATUS_META[appointment.status].className,
+            )}
+          >
+            {STATUS_META[appointment.status].label}
+          </span>
+        </div>
         <DialogDescription>
           Veja os detalhes do agendamento selecionado.
         </DialogDescription>
@@ -49,7 +60,7 @@ export function DialogAppointment({ appointment }: DialogAppointmentProps) {
               {appointment.email}
             </p>
 
-            <section className="bg-gray-100 mt-4 p-2 rounded-md">
+            <section className="bg-muted mt-4 p-2 rounded-md">
               <p>
                 <span className="font-semibold">Serviço:</span>
                 {appointment.service.name}

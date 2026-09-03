@@ -9,6 +9,10 @@ export async function getProfessionals() {
       },
       include: {
         subscription: true,
+        services: {
+          where: { status: true },
+          select: { name: true },
+        },
       },
     });
     return professionals;

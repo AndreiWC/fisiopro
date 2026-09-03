@@ -126,7 +126,7 @@ export function DialogService({
           Novo Serviço
         </DialogTitle>
         <DialogDescription>
-          Adicione um novo serviço para sua clínica.
+          Adicione um novo serviço para o seu negócio.
         </DialogDescription>
       </DialogHeader>
 
@@ -201,11 +201,7 @@ export function DialogService({
               />
             </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-400"
-              disabled={loading}
-            >
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading
                 ? "Cadastrando..."
                 : `${serviceId ? "Atualizar Serviço" : "Cadastrar Serviço"}`}

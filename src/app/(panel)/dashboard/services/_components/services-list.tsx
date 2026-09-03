@@ -83,7 +83,7 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
             {!permissions.hasPermission && (
               <Link
                 href="/dashboard/plans"
-                className="text-red-500 hover:underline"
+                className="text-destructive hover:underline"
               >
                 Limite de serviços atingido
               </Link>
@@ -122,16 +122,16 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
               {servicesList.map((service) => (
                 <article
                   key={service.id}
-                  className="p-4 border rounded-xl bg-gray-50 hover:bg-gray-100 transition"
+                  className="p-4 border border-border rounded-xl bg-muted/40 hover:bg-muted transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     {/* Nome + Preço */}
                     <div>
                       <h3 className="font-semibold">{service.name}</h3>
-                      <span className="text-gray-700 font-medium block">
+                      <span className="block font-mono font-medium tabular-nums text-foreground">
                         {formatvalue(service.price.toString())}
                       </span>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         {service.duration} min
                       </p>
                     </div>
@@ -141,17 +141,17 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
                       {/* Editar */}
                       <button
                         onClick={() => handleEditService(service)}
-                        className="p-2 rounded-lg hover:bg-gray-200 transition"
+                        className="p-2 rounded-lg hover:bg-secondary transition-colors"
                       >
-                        <Pencil size={18} className="text-gray-700" />
+                        <Pencil size={18} className="text-foreground/70" />
                       </button>
 
                       {/* Excluir */}
                       <button
                         onClick={() => handleDeleteService(service.id)}
-                        className="p-2 rounded-lg hover:bg-red-200 transition"
+                        className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
                       >
-                        <Trash size={18} className="text-red-600" />
+                        <Trash size={18} className="text-destructive" />
                       </button>
                     </div>
                   </div>

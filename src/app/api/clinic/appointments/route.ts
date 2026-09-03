@@ -33,6 +33,7 @@ export const GET = auth(async function GET(request) {
     const appointments = await prisma.appointments.findMany({
       where: {
         userId: clinicId,
+        status: { not: "CANCELLED" },
         AppointmentDate: {
           gte: startDate,
           lte: endDate,

@@ -1,3 +1,8 @@
+export interface TimeSlot {
+  time: string;
+  available: boolean;
+}
+
 export function isToday(date: Date) {
   const today = new Date();
   return (

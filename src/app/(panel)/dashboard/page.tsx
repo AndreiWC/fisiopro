@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import getSession from "@/lib/getSession";
-import { Calendar, Target } from "lucide-react";
+import { Calendar, PartyPopper } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ButtonCopyLink } from "./_components/button-copy-link";
@@ -18,15 +18,26 @@ export default async function Dashboard() {
 
   return (
     <main>
-      <div className="space-x-2 flex items-center justify-end">
-        <Link href={`/clinica/${session.user.id}`} target="_blank">
-          <Button className="bg-blue-500 hover:bg-blue-400 text-white flex-1 md:flex-[0]">
-            <Calendar className="w-5 h-5" />
-            <span>Novo agendamento</span>
-          </Button>
-        </Link>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            Hoje
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Sua agenda e seus lembretes, em um só lugar.
+          </p>
+        </div>
 
-        <ButtonCopyLink userId={session.user.id!} />
+        <div className="flex items-center gap-2">
+          <Link href={`/clinica/${session.user.id}`} target="_blank">
+            <Button className="flex-1 md:flex-[0]">
+              <Calendar className="w-5 h-5" />
+              <span>Novo agendamento</span>
+            </Button>
+          </Link>
+
+          <ButtonCopyLink userId={session.user.id!} />
+        </div>
       </div>
 
       {subscription?.subscriptionStatus === "EXPIRED" && (
@@ -34,15 +45,16 @@ export default async function Dashboard() {
       )}
 
       {subscription?.subscriptionStatus === "TRIAL" && (
-        <div className="bg-green-500 text-white text-sm md:text-base px-3 py-2 my-4 rounded-md flex flex-col md:flex-row items-center md:items-center justify-between gap-1">
-          <p className="font-semibold">
+        <div className="my-4 flex flex-col items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm md:flex-row md:items-center md:text-base">
+          <PartyPopper className="h-5 w-5 shrink-0 text-primary" />
+          <p className="font-medium text-foreground">
             {subscription?.message || "Seu período de teste está ativo!"}
           </p>
         </div>
       )}
 
       {subscription?.subscriptionStatus !== "EXPIRED" && (
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-2 mt-4">
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Appointments userId={session.user.id!} />
           <Reminders userId={session.user.id!} />
         </section>

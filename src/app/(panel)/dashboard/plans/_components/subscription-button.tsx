@@ -27,8 +27,8 @@ export function SubscriptionButton({ type }: SubscriptionButtonProps) {
     <Button
       className={`w-full py-6 text-base font-bold transition-all ${
         type === "PROFESSIONAL"
-          ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/30"
-          : "bg-slate-100 hover:bg-slate-200 text-slate-900"
+          ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+          : "bg-secondary hover:bg-secondary/80 text-secondary-foreground"
       }`}
       onClick={handleCreateBilling}
     >

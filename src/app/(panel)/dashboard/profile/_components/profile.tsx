@@ -46,6 +46,9 @@ import { formatPhone } from "@/utils/formatPhone";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { AvatarProfile } from "./profile-avatar";
+import { SEGMENT_OPTIONS } from "@/utils/segments";
+import { ProfileOverview } from "./profile-overview";
+import type { ProfileOverview as ProfileOverviewData } from "../_data-access/get-profile-overview";
 
 type UserWithSubscription = Prisma.UserGetPayload<{
   include: {
@@ -53,14 +56,12 @@ type UserWithSubscription = Prisma.UserGetPayload<{
   };
 }>;
 
-/**
- *
- */
 interface ProfileContentProps {
   user: UserWithSubscription;
+  overview: ProfileOverviewData;
 }
 // função de gerar os horários de 30 em 30 minutos das 8h às 23:30h
-export function ProfileContent({ user }: ProfileContentProps) {
+export function ProfileContent({ user, overview }: ProfileContentProps) {
  
 
   function generateTimeSlote(): string[] {
@@ -104,6 +105,8 @@ export function ProfileContent({ user }: ProfileContentProps) {
     address: user.address,
     phone: user.phone,
     status: user.status,
+    segment: user.segment,
+    professionalRegistration: user.professionalRegistration,
     timeZone: user.timezone,
   });
 
@@ -113,6 +116,8 @@ export function ProfileContent({ user }: ProfileContentProps) {
       address: value.address,
       phone: value.phone,
       status: value.status === "active" ? true : false,
+      segment: value.segment,
+      professionalRegistration: value.professionalRegistration,
       timeZone: value.timeZone,
       times: selectedTime || [],
     });
@@ -133,6 +138,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
   return (
     <div className="mx-auto">
+      <ProfileOverview {...overview} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
@@ -142,7 +148,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
             <CardContent className="space-6">
               <div className="flex justify-center">
-                <div className="bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden">
+                <div className="bg-muted relative h-40 w-40 rounded-full overflow-hidden">
                   <AvatarProfile avatarUrl={user.image} userId={user.id} />
                 </div>
               </div>
@@ -159,7 +165,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Digite o nome da clínica."
+                          placeholder="Digite o nome do seu negócio."
                         ></Input>
                       </FormControl>
                       <FormMessage />
@@ -178,7 +184,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Digite o endereço da clínica."
+                          placeholder="Digite o endereço do seu negócio."
                         ></Input>
                       </FormControl>
                       <FormMessage />
@@ -195,7 +201,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Digite o telefone da clínica."
+                          placeholder="Digite o telefone do seu negócio."
                           onChange={(e) => {
                             const formatvalue = formatPhone(e.target.value);
                             field.onChange(formatvalue);
@@ -209,11 +215,60 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
                 <FormField
                   control={form.control}
+                  name="segment"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel className="font-semibold">
+                        Segmento do negócio
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecione o segmento do seu negócio." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SEGMENT_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                ></FormField>
+
+                <FormField
+                  control={form.control}
+                  name="professionalRegistration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-semibold">
+                        Registro profissional
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Ex: CREFITO 3/12345-F"
+                        ></Input>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                ></FormField>
+
+                <FormField
+                  control={form.control}
                   name="status"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel className="font-semibold">
-                        Status da clínica
+                        Status do negócio
                       </FormLabel>
                       <FormControl>
                         <Select
@@ -221,7 +276,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                           defaultValue={field.value ? "active" : "inactive"}
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione o status da clínica." />
+                            <SelectValue placeholder="Selecione o status do negócio." />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="active">Ativo</SelectItem>
@@ -235,7 +290,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
                 <div className="space-y-2">
                   <Label className="font-semibold">
-                    Agendamento de horários da clínica
+                    Horários de atendimento
                   </Label>
 
                   <Dialog open={DialogOpen} onOpenChange={setDialogOpen}>
@@ -251,10 +306,11 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Horário da clínica</DialogTitle>
+                        <DialogTitle>Horário de atendimento</DialogTitle>
                         <DialogDescription>
                           <Label className="font-semibold">
-                            Selecione o horário de funcionamento da clínica.
+                            Selecione o horário de funcionamento do seu
+                            negócio.
                           </Label>
                         </DialogDescription>
                       </DialogHeader>
@@ -265,9 +321,9 @@ export function ProfileContent({ user }: ProfileContentProps) {
                               key={time}
                               variant="outline"
                               className={cn(
-                                "h-10",
+                                "h-10 font-mono tabular-nums",
                                 selectedTime.includes(time) &&
-                                  "border-2 border-blue-500 text-primary",
+                                  "border-2 border-primary text-primary",
                               )}
                               onClick={() => toggleTimeSelection(time)}
                             >
@@ -292,7 +348,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel className="font-semibold">
-                        Selecione o fuso horário da clínica
+                        Selecione o fuso horário do seu negócio
                       </FormLabel>
                       <FormControl>
                         <Select
@@ -315,9 +371,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
                   )}
                 ></FormField>
 
-                <Button className="w-full bg-blue-500 hover:bg-blue-400">
-                  Salvar alterações
-                </Button>
+                <Button className="w-full">Salvar alterações</Button>
               </div>
             </CardContent>
           </Card>

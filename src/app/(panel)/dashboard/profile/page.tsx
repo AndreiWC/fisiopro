@@ -1,6 +1,7 @@
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { getUserData } from "./_data-access/get-info-user";
+import { getProfileOverview } from "./_data-access/get-profile-overview";
 import { ProfileContent } from "./_components/profile";
 
 export default async function Profile() {
@@ -16,9 +17,11 @@ export default async function Profile() {
     redirect("/");
   }
 
+  const overview = await getProfileOverview(user.id);
+
   return (
     <div>
-      <ProfileContent user={user} />
+      <ProfileContent user={user} overview={overview} />
     </div>
   );
 }

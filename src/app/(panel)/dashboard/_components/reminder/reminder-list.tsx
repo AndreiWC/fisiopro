@@ -58,21 +58,26 @@ export function ReminderList({ reminder }: ReminderListProps) {
           </Dialog>
         </CardHeader>
         {reminder.length === 0 && (
-          <p className="text-sm text-gray-500">Nenhum lembrete para hoje.</p>
+          <p className="text-sm text-muted-foreground">
+            Nenhum lembrete para hoje.
+          </p>
         )}
         <ScrollArea className="h-[340px] lg:max-h-[calc(100vh-15rem)] pr-0 w-full flex-1">
           {reminder.map((item) => (
             <article
               key={item.id}
-              className="flex flex-wrap flex-row items-center justify-between py-2 bg-yellow-100 px-2 mb-2 rounded-md"
+              className="flex flex-wrap flex-row items-center justify-between py-2 bg-accent px-2 mb-2 rounded-md"
             >
-              <p className="text-sm text-gray-500">{item.description}</p>
+              <p className="text-sm text-accent-foreground">
+                {item.description}
+              </p>
               <Button
-                className="bg-red-500 hover:bg-red-400 h-6 w-6 p-0 rounded-full"
-                size="sm"
+                variant="ghost"
+                size="icon-sm"
+                className="rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => handleDeleteReminder(item.id)}
               >
-                <Trash className="w-2 h-2 text-white" />
+                <Trash className="w-3.5 h-3.5" />
               </Button>
             </article>
           ))}

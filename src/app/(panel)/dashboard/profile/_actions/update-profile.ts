@@ -4,12 +4,15 @@ import prisma from "@/lib/prisma";
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { Segment } from "@prisma/client";
 
 const formShema = z.object({
   name: z.string().min(1, { message: "O nome é obrigatório" }),
   address: z.string().optional(),
   phone: z.string().optional(),
   status: z.boolean(),
+  segment: z.nativeEnum(Segment).optional(),
+  professionalRegistration: z.string().optional(),
   timeZone: z.string(),
   times: z.array(z.string()),
 });
@@ -35,6 +38,8 @@ export async function updateProfileAction(formData: formShema) {
         address: formData.address,
         phone: formData.phone,
         status: formData.status,
+        segment: formData.segment,
+        professionalRegistration: formData.professionalRegistration,
         timezone: formData.timeZone,
         times: formData.times,
       },

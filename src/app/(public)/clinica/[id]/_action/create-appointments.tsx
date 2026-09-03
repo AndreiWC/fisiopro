@@ -30,6 +30,23 @@ export async function createNewAppointment(formData: FormSchema) {
     const day = selectedDate.getDate();
 
     const appointmentDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0)); // Cria a data no formato UTC
+
+    const customer = await prisma.customer.upsert({
+      where: {
+        userId_email: { userId: formData.clinicId, email: formData.email },
+      },
+      create: {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        userId: formData.clinicId,
+      },
+      update: {
+        name: formData.name,
+        phone: formData.phone,
+      },
+    });
+
     const newAppointment = await prisma.appointments.create({
       data: {
         name: formData.name,
@@ -44,6 +61,9 @@ export async function createNewAppointment(formData: FormSchema) {
         },
         user: {
           connect: { id: formData.clinicId },
+        },
+        customer: {
+          connect: { id: customer.id },
         },
       },
     });

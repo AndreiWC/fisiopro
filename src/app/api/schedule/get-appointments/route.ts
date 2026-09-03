@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
   const dateParm = searchParams.get("date");
+  const excludeAppointmentId = searchParams.get("excludeAppointmentId");
 
   if (!userId || !dateParm || userId === "null" || dateParm === "null") {
     return NextResponse.json(
@@ -34,10 +35,12 @@ export async function GET(request: NextRequest) {
     const appointments = await prisma.appointments.findMany({
       where: {
         userId: userId || undefined,
+        status: { not: "CANCELLED" },
         AppointmentDate: {
           gte: startDate,
           lte: endDate,
         },
+        ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
       },
       include: {
         service: true,

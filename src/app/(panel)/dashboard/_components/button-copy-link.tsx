@@ -14,7 +14,7 @@ export function ButtonCopyLink({ userId }: { userId: string }) {
   }
 
   return (
-    <Button onClick={handleCopyLink}>
+    <Button variant="outline" size="icon" onClick={handleCopyLink}>
       <LinkIcon className="w-5 h-5" />
     </Button>
   );

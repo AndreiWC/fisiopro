@@ -2,12 +2,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Segment } from "@prisma/client";
 
 interface ProfileFormProps {
   name: string | null;
   address: string | null;
   phone: string | null;
   status: boolean;
+  segment: Segment | null;
+  professionalRegistration: string | null;
   timeZone: string | null;
 }
 
@@ -16,6 +19,8 @@ const profileShema = z.object({
   address: z.string().optional(),
   phone: z.string().optional(),
   status: z.string(),
+  segment: z.nativeEnum(Segment).optional(),
+  professionalRegistration: z.string().optional(),
   timeZone: z.string().min(1, { message: "O time zone é obrigatório" }),
 });
 
@@ -26,6 +31,8 @@ export function useProfileForm({
   address,
   phone,
   status,
+  segment,
+  professionalRegistration,
   timeZone,
 }: ProfileFormProps) {
   return useForm<ProfileFormData>({
@@ -35,6 +42,8 @@ export function useProfileForm({
       address: address || "",
       phone: phone || "",
       status: status ? "active" : "inactive",
+      segment: segment ?? undefined,
+      professionalRegistration: professionalRegistration || "",
       timeZone: timeZone || "",
     },
   });

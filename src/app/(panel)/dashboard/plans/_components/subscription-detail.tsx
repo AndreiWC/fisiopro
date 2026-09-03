@@ -58,8 +58,8 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
           <div
             className={`px-3 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${
               isActive
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                ? "bg-primary/10 text-primary"
+                : "bg-destructive/10 text-destructive"
             }`}
           >
             {isActive ? "Ativo" : "Inativo"}
@@ -97,7 +97,7 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
       <CardFooter className="pt-4 border-t bg-muted/20">
         <Button
           onClick={handleManageSubscription}
-          className="w-full transition-all bg-blue-500 text-white"
+          className="w-full transition-all"
           variant={isActive ? "outline" : "default"}
         >
           Gerenciar Assinatura

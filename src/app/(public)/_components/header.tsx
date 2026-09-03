@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Sheet,
@@ -11,20 +12,33 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LogIn, Menu, SettingsIcon, UserStar } from "lucide-react";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { handleRegister } from "../_actions/login";
-import logoimg from "../../../../public/logo2.png";
+import { Logo } from "@/components/brand/logo";
+import { getCurrentPatient } from "../_actions/patient-auth";
+
+function patientInitials(name: string | null) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
 
 export function Header() {
   const { data: session, status } = useSession();
   const [isOpen, seIsOpen] = useState(false);
+  const [patient, setPatient] = useState<{
+    name: string | null;
+    image: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (session) return;
+    getCurrentPatient().then(setPatient);
+  }, [session]);
 
   const navItems = [{ href: "#profissionais", label: "Profissionais" }];
-  async function handleLogin() {
-    await handleRegister("google");
-  }
- 
+
   const NavLinks = () => (
     <>
       {navItems.map((item) => (
@@ -32,7 +46,7 @@ export function Header() {
           onClick={() => seIsOpen(false)}
           key={item.href}
           asChild
-          className="bg-transparent hover:bg-transparent text-black shadow-none"
+          variant="ghost"
         >
           <Link href={item.href} className="text-base">
             {item.label}
@@ -45,34 +59,43 @@ export function Header() {
       ) : session ? (
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 bg-zinc-900 text-white py-1 rounded-md px-4"
+          className="flex items-center justify-center gap-2 bg-primary text-primary-foreground py-1.5 rounded-md px-4 text-sm font-medium hover:bg-primary/90"
         >
-          Painel da Clínica
+          Acessar meu painel
+        </Link>
+      ) : patient ? (
+        <Link
+          href="/perfil"
+          onClick={() => seIsOpen(false)}
+          className="flex items-center gap-2 rounded-full py-1 pr-3 pl-1 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+        >
+          {patient.image ? (
+            <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
+              <Image src={patient.image} alt="" fill sizes="28px" className="object-cover" />
+            </span>
+          ) : (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              {patientInitials(patient.name)}
+            </span>
+          )}
+          {patient.name?.split(" ")[0] ?? "Meu perfil"}
         </Link>
       ) : (
-        <Button onClick={handleLogin}>
-          <LogIn />
-          Fazer Login
+        <Button asChild onClick={() => seIsOpen(false)}>
+          <Link href="/login">
+            <LogIn />
+            Fazer login
+          </Link>
         </Button>
       )}
     </>
   );
 
   return (
-    <header className="fixed to-0% right-0 left-0 z-[999] py-4 px-6 bg-white">
+    <header className="fixed to-0% right-0 left-0 z-[999] py-4 px-6 bg-background/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto flex items-center justify-between">
-        {/* <Link href="/" className="text-3xl font-bold text-zinc-900">
-          Fisio
-          <span className="text-3xl font-bold text-blue-500">Pro</span>
-        </Link> */}
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src={logoimg}
-            alt="FisioPro"
-            width={140} // ajuste conforme o tamanho da sua logo
-            height={50} // idem
-            priority
-          />
+        <Link href="/">
+          <Logo />
         </Link>
         <nav className="hidden md:flex items-center space-x-4">
           <NavLinks />
@@ -80,11 +103,7 @@ export function Header() {
 
         <Sheet open={isOpen} onOpenChange={seIsOpen}>
           <SheetTrigger asChild className="md:hidden">
-            <Button
-              className="text-black hover:bg-transparent"
-              variant="ghost"
-              size="icon"
-            >
+            <Button variant="ghost" size="icon">
               <Menu className="w-6 h-6" />
             </Button>
           </SheetTrigger>

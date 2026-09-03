@@ -7,7 +7,7 @@ export async function Appointments({ userId }: { userId: string }) {
 
   return (
     <Suspense fallback={<p>Carregando agendamentos...</p>}>
-      <AppointmentsList times={timer} />
+      <AppointmentsList times={timer} userId={id} />
     </Suspense>
   );
 }

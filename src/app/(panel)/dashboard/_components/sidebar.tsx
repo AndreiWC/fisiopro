@@ -26,10 +26,10 @@ import {
   Folder,
   List,
   Settings,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import logoimg from "../../../../../public/logo2.png";
+import { Logo } from "@/components/brand/logo";
 
 export function SidebarDashboard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -47,20 +47,24 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
           }
         )}
       >
-        <div className="mb-6 mt-4 ">
+        <div className="mb-6 mt-4">
           {!isCollapsed && (
-            <Image src={logoimg} alt="Logo fisiopro" priority quality={100} />
+            <Link href="/">
+              <Logo />
+            </Link>
           )}
         </div>
 
         <Button
-          className="bg-gray-100 hover:bg-gray-50 text-zinc-900 self-end mb-2"
+          variant="secondary"
+          size="icon"
+          className="self-end mb-2"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {!isCollapsed ? (
-            <ChevronLeft className="w-12 h-12" />
+            <ChevronLeft className="w-5 h-5" />
           ) : (
-            <ChevronRight className="w-12 h-12" />
+            <ChevronRight className="w-5 h-5" />
           )}
         </Button>
 
@@ -73,6 +77,14 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
               pathname={pathname}
               isCollapsed={isCollapsed}
               icon={<CalendarCheck2 className="w-6 h-6" />}
+            />
+
+            <SlidebarLink
+              href="/dashboard/patients"
+              label="Pacientes"
+              pathname={pathname}
+              isCollapsed={isCollapsed}
+              icon={<Users className="w-6 h-6" />}
             />
 
             <SlidebarLink
@@ -103,7 +115,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
         <Collapsible open={!isCollapsed}>
           <CollapsibleContent>
             <nav className="flex flex-col gap-1 overflow-hidden">
-              <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
+              <span className="text-sm text-muted-foreground font-medium mt-1 uppercase tracking-wide">
                 Painel
               </span>
 
@@ -116,6 +128,14 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
               />
 
               <SlidebarLink
+                href="/dashboard/patients"
+                label="Pacientes"
+                pathname={pathname}
+                isCollapsed={isCollapsed}
+                icon={<Users className="w-6 h-6" />}
+              />
+
+              <SlidebarLink
                 href="/dashboard/services"
                 label="Serviços"
                 pathname={pathname}
@@ -123,7 +143,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                 icon={<Folder className="w-6 h-6" />}
               />
 
-              <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
+              <span className="text-sm text-muted-foreground font-medium mt-1 uppercase tracking-wide">
                 Configurações
               </span>
 
@@ -153,8 +173,8 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
         })}
       >
         <header
-          className="md:hidden flex items-center justify-between border-b
-                px-2 md:px-6 h-14 z-10 sticky top-0 bg-white"
+          className="md:hidden flex items-center justify-between border-b border-border
+                px-2 md:px-6 h-14 z-10 sticky top-0 bg-background"
         >
           <Sheet>
             <div className="flex items-center gap-4">
@@ -168,16 +188,18 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                   <List className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
-              <h1 className="text-base md:text-lg font-semibold">
-                Menu FisioPRO
-              </h1>
+              <Link href="/">
+                <Logo iconClassName="h-6 w-6" wordmarkClassName="text-base" />
+              </Link>
             </div>
 
-            <SheetContent side="right" className="sm:max-w-xs text-black p-6">
+            <SheetContent side="right" className="sm:max-w-xs p-6">
               <SheetTitle className="text-lg font-bold leading-tight">
-                FisioPRO
+                <Link href="/">
+                  <Logo iconClassName="h-6 w-6" wordmarkClassName="text-base" />
+                </Link>
               </SheetTitle>
-              <SheetDescription className="text-sm text-gray-500 mb-0">
+              <SheetDescription className="text-sm text-muted-foreground mb-0">
                 Menu administrativo
               </SheetDescription>
               <nav className="grid gap-2 text-base">
@@ -187,6 +209,14 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                   pathname={pathname}
                   isCollapsed={isCollapsed}
                   icon={<CalendarCheck2 className="w-6 h-6" />}
+                />
+
+                <SlidebarLink
+                  href="/dashboard/patients"
+                  label="Pacientes"
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<Users className="w-6 h-6" />}
                 />
 
                 <SlidebarLink
@@ -244,8 +274,8 @@ function SlidebarLink({
         className={clsx(
           "flex items-center gap-2  px-3 py-2 rounded-md transition-colors",
           {
-            "text-white bg-blue-600": pathname === href,
-            "text-gray-700 hover:bg-gray-100": pathname !== href,
+            "text-primary-foreground bg-primary": pathname === href,
+            "text-foreground/80 hover:bg-secondary": pathname !== href,
           }
         )}
       >

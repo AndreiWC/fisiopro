@@ -14,13 +14,19 @@ export const appointmentSchema = z.object({
 });
 export type AppointmentFormData = z.infer<typeof appointmentSchema>;
 
-export function useAppointmentForm() {
+interface KnownPatient {
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+}
+
+export function useAppointmentForm(knownPatient?: KnownPatient) {
   return useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
+      name: knownPatient?.name ?? "",
+      email: knownPatient?.email ?? "",
+      phone: knownPatient?.phone ?? "",
       date: new Date(),
       time: "",
       serviceId: "",

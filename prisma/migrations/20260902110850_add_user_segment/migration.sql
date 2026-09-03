@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "Segment" AS ENUM ('BARBEARIA', 'SALAO_BELEZA', 'CLINICA_ESTETICA', 'FISIOTERAPIA', 'ODONTOLOGIA', 'MEDICO');
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "segment" "Segment";

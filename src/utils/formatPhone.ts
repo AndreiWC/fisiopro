@@ -17,3 +17,11 @@ export function unformatPhone(formattedPhone: string) {
   // Remove todos os caracteres que não são dígitos
   return formattedPhone.replace(/[\(\)\s-]/g, "");
 }
+
+export function formatCpf(cpf: string) {
+  const digits = cpf.replace(/\D/g, "").slice(0, 11);
+  return digits
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}

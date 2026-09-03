@@ -27,10 +27,13 @@ export async function cancelAppointment(formData: FormSchema) {
   }
 
   try {
-    await prisma.appointments.delete({
+    await prisma.appointments.update({
       where: {
         id: formData.appointmentId,
         userId: session?.user?.id,
+      },
+      data: {
+        status: "CANCELLED",
       },
     });
     revalidatePath("/dashboard");

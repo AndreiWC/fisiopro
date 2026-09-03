@@ -17,10 +17,11 @@ datasource db {
 model Appointments{
 id            String	@id @default(uuid())
 name          String?
-email         String 	@unique
+email         String
 phone         String? @default("")
 AppointmentDate DateTime
 time String
+status AppointmentStatus @default(CONFIRMED)
 
 serviceId String
 service Service @relation(fields:[serviceId], references:[id])
@@ -35,15 +36,34 @@ createdAt DateTime @default(now())
 updatedAt DateTime @updatedAt
 }
 
+model Patient {
+	id        String   @id @default(cuid())
+	name      String?
+	email     String   @unique
+	phone     String?
+	image     String?
+	cpf       String?  @unique
+
+	insuranceName   String?
+	insuranceNumber String?
+
+	emergencyContactName  String?
+	emergencyContactPhone String?
+
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+}
+
 model Customer{
 	id            String	@id @default(uuid())
 	name          String?
-	email         String 	@unique
-	cpf           String   	@unique
+	email         String
+	cpf           String?  	@unique
 	image         String?
 	address        String? @default("")
 	phone         String? @default("")
 	status        Boolean @default(true)
+	treatmentStatus CustomerStatus @default(AGUARDANDO)
 
 	userId String
 	user User @relation(fields:[userId], references:[id])
@@ -52,6 +72,22 @@ model Customer{
 
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
+
+	@@unique([userId, email])
+}
+
+enum AppointmentStatus {
+	CONFIRMED
+	IN_PROGRESS
+	COMPLETED
+	NO_SHOW
+	CANCELLED
+}
+
+enum CustomerStatus {
+	AGUARDANDO
+	EM_TRATAMENTO
+	ALTA
 }
 model Reminder{
 	id String @id @default(uuid())
@@ -82,6 +118,15 @@ enum Plan{
 	PROFESSIONAL
 }
 
+enum Segment{
+	BARBEARIA
+	SALAO_BELEZA
+	CLINICA_ESTETICA
+	FISIOTERAPIA
+	ODONTOLOGIA
+	MEDICO
+}
+
 model Subscription{
 	id  			String @id @default(uuid())
 	status 			String
@@ -104,6 +149,8 @@ model User {
 	address        String? @default("")
 	phone         String? @default("")
 	status        Boolean @default(true)
+	segment       Segment?
+	professionalRegistration String?
 	timezone      String?
 	times		  String[] @default([])
 	stripe_customer_id String?
