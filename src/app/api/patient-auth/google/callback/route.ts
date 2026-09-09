@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { setPatientSessionCookie } from "@/lib/patient-session";
 import { parseOAuthState } from "@/lib/patient-google-oauth";
 
 const STATE_COOKIE = "encaixa_patient_oauth_state";
+const CLINIC_SESSION_COOKIE =
+  process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
+const CLINIC_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias, mesmo padrão do NextAuth
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -58,6 +62,31 @@ export async function GET(request: NextRequest) {
     }
 
     const email = profile.email.toLowerCase();
+
+    // Esse e-mail já é uma conta de clínica? Entra no ambiente da clínica em vez de virar paciente.
+    const clinicUser = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+    });
+
+    if (clinicUser) {
+      const sessionToken = crypto.randomBytes(32).toString("hex");
+      const expires = new Date(Date.now() + CLINIC_SESSION_TTL_MS);
+      await prisma.session.create({
+        data: { sessionToken, userId: clinicUser.id, expires },
+      });
+
+      const response = NextResponse.redirect(`${baseUrl}/dashboard`);
+      response.cookies.set(CLINIC_SESSION_COOKIE, sessionToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        expires,
+      });
+      response.cookies.delete(STATE_COOKIE);
+      return response;
+    }
+
     const patient = await prisma.patient.upsert({
       where: { email },
       create: { email, name: profile.name ?? null, image: profile.picture ?? null },

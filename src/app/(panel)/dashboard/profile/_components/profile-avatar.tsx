@@ -9,9 +9,14 @@ import { useSession } from "next-auth/react";
 interface AvatarProfileProps {
   avatarUrl: string | null;
   userId: string;
+  sizeClassName?: string;
 }
 
-export function AvatarProfile({ avatarUrl, userId }: AvatarProfileProps) {
+export function AvatarProfile({
+  avatarUrl,
+  userId,
+  sizeClassName = "w-40 h-40",
+}: AvatarProfileProps) {
   const [previewImage, setPreviewImage] = useState(avatarUrl);
   const [loading, setLoading] = useState(false);
   const { update } = useSession();
@@ -80,9 +85,9 @@ export function AvatarProfile({ avatarUrl, userId }: AvatarProfileProps) {
   }
 
   return (
-    <div className="relative w-40 h-40 ">
-      <div className="relative flex items-center justify-center w-full h-full ">
-        <span className="absolute cursor-pointer z-[2] bg-card/90 text-foreground p-2 rounded-full shadow-xl">
+    <div className={`relative overflow-hidden rounded-full bg-muted ${sizeClassName}`}>
+      <div className="absolute inset-0 z-2 flex items-center justify-center">
+        <span className="pointer-events-none absolute cursor-pointer bg-card/90 text-foreground p-2 rounded-full shadow-xl">
           {loading ? (
             <Loader size={16} className="animate-spin" />
           ) : (
@@ -92,7 +97,7 @@ export function AvatarProfile({ avatarUrl, userId }: AvatarProfileProps) {
 
         <input
           type="file"
-          className="opacity-0 cursor-pointer relative z-50 w-48 h-48"
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           accept="image/*"
           onChange={handleChange}
         />
@@ -103,7 +108,7 @@ export function AvatarProfile({ avatarUrl, userId }: AvatarProfileProps) {
           src={previewImage}
           alt="Foto de perfil da clinica"
           fill
-          className="w-full h-48 object-cover rounded-full bg-muted"
+          className="object-cover"
           quality={100}
           priority
           sizes="(max-width: 480px) 100vw, (max-width: 1024px) 75vw, 60vw"
@@ -113,7 +118,7 @@ export function AvatarProfile({ avatarUrl, userId }: AvatarProfileProps) {
           src={semFoto}
           alt="Foto de perfil da clinica"
           fill
-          className="w-full h-48 object-cover rounded-full bg-muted"
+          className="object-cover"
           quality={100}
           priority
           sizes="(max-width: 480px) 100vw, (max-width: 1024px) 75vw, 60vw"

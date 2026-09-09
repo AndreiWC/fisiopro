@@ -10,8 +10,21 @@ export default async function Services() {
   }
 
   return (
-    <Suspense fallback={<p>Carregando serviços...</p>}>
-      <ServicesContent userId={session.user.id} />
-    </Suspense>
+    <main>
+      <div>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          Serviços
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          O que sua clínica oferece — preço e duração de cada sessão.
+        </p>
+      </div>
+
+      <div className="mt-4">
+        <Suspense fallback={<p className="text-sm text-muted-foreground">Carregando serviços...</p>}>
+          <ServicesContent userId={session.user.id} />
+        </Suspense>
+      </div>
+    </main>
   );
 }

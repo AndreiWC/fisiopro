@@ -1,14 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { Github, LogIn, Stethoscope, User } from "lucide-react";
-import { handleRegister } from "../../_actions/login";
-import { PatientLoginForm } from "../../_components/patient-login-form";
+import { ArrowRight, Github, LogIn, Stethoscope, User } from "lucide-react";
+import { handleRegister } from "../_actions/login";
+import { PatientLoginForm } from "./patient-login-form";
 import { cn } from "@/lib/utils";
 
 type Mode = "choose" | "clinica" | "paciente";
 
-export function LoginChooser() {
+interface LoginChooserProps {
+  heading?: string;
+  description?: string;
+  patientNext?: string;
+}
+
+export function LoginChooser({
+  heading = "Entrar na Encaixa",
+  description = "Como você quer entrar?",
+  patientNext = "/perfil",
+}: LoginChooserProps) {
   const [mode, setMode] = useState<Mode>("choose");
 
   if (mode === "clinica") {
@@ -48,7 +58,7 @@ export function LoginChooser() {
       <div>
         <BackButton onClick={() => setMode("choose")} />
         <div className="mt-3">
-          <PatientLoginForm title="Entrar como paciente" next="/perfil" />
+          <PatientLoginForm title="Entrar como paciente" next={patientNext} />
         </div>
       </div>
     );
@@ -56,8 +66,8 @@ export function LoginChooser() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold text-foreground">Entrar na Encaixa</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Como você quer entrar?</p>
+      <h1 className="font-display text-2xl font-semibold text-foreground">{heading}</h1>
+      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <ChoiceCard
@@ -105,13 +115,16 @@ function ChoiceCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/50 hover:bg-secondary/40",
+        "group flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/50 hover:bg-secondary/40",
       )}
     >
       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
         <Icon className="h-5 w-5" />
       </span>
-      <span className="font-semibold text-foreground">{title}</span>
+      <span className="flex w-full items-center justify-between gap-2 font-semibold text-foreground">
+        {title}
+        <ArrowRight className="h-4 w-4 shrink-0 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+      </span>
       <span className="text-sm text-muted-foreground">{description}</span>
     </button>
   );
