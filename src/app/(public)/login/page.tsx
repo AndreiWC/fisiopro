@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getActiveOrganization, getActivePatientProfile } from "@/lib/organization";
+import { isSafeRedirectTarget } from "@/lib/utils";
 import { LoginChooser } from "../_components/login-chooser";
 import { RoleChooser } from "../_components/role-chooser";
 
@@ -29,8 +30,7 @@ export default async function LoginPage({
     redirect("/dashboard");
   }
   if (patientProfile) {
-    const safeNext = next && next.startsWith("/") && !next.startsWith("//");
-    redirect(safeNext ? next : "/perfil");
+    redirect(isSafeRedirectTarget(next) ? next : "/perfil");
   }
 
   return (

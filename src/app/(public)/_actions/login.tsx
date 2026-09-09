@@ -3,12 +3,12 @@
 import { redirect } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { requestLoginCode } from "@/lib/patient-otp";
+import { isSafeRedirectTarget } from "@/lib/utils";
 
 type LoginType = "google" | "github";
 
 function loginRedirect(next?: string) {
-  const safeNext = next && next.startsWith("/") && !next.startsWith("//");
-  return safeNext ? `/login?next=${encodeURIComponent(next)}` : "/login";
+  return isSafeRedirectTarget(next) ? `/login?next=${encodeURIComponent(next)}` : "/login";
 }
 
 export async function handleRegister(provider: LoginType, next?: string) {

@@ -3,11 +3,8 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getActiveOrganization } from "@/lib/organization";
+import { isSafeRedirectTarget } from "@/lib/utils";
 import { redirect } from "next/navigation";
-
-function isSafeNext(next?: string): next is string {
-  return Boolean(next) && next!.startsWith("/") && !next!.startsWith("//");
-}
 
 export async function chooseClinicRole() {
   const session = await auth();
@@ -52,5 +49,5 @@ export async function choosePatientRole(next?: string) {
     data: { userId: session.user.id },
   });
 
-  redirect(isSafeNext(next) ? next : "/perfil");
+  redirect(isSafeRedirectTarget(next) ? next : "/perfil");
 }
