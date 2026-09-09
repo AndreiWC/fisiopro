@@ -1,4 +1,4 @@
-import { PatientLoginForm } from "./patient-login-form";
+import { LoginChooser } from "./login-chooser";
 
 interface PatientLoginGateProps {
   title: string;
@@ -8,7 +8,7 @@ interface PatientLoginGateProps {
 export function PatientLoginGate({ title, next }: PatientLoginGateProps) {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6">
-      <PatientLoginForm title={title} next={next} />
+      <LoginChooser description={title} next={next} />
     </div>
   );
 }

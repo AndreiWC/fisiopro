@@ -1,23 +1,44 @@
 "use server";
 
+import { auth, signOut } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getPatientSessionData, clearPatientSessionCookie } from "@/lib/patient-session";
 
-export async function getCurrentPatient() {
-  const session = await getPatientSessionData();
-  if (!session) return null;
+export type CurrentPatient = {
+  id: string;
+  name: string | null;
+  email: string;
+  phone: string | null;
+  cpf: string | null;
+  insuranceName: string | null;
+  insuranceNumber: string | null;
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
+};
 
-  try {
-    const patient = await prisma.patient.findUnique({ where: { id: session.id } });
-    if (!patient || patient.email.toLowerCase() !== session.email.toLowerCase()) {
-      return null;
-    }
-    return patient;
-  } catch {
-    return null;
-  }
+export async function getCurrentPatient(): Promise<CurrentPatient | null> {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const [user, patientProfile] = await Promise.all([
+    prisma.user.findUnique({ where: { id: session.user.id } }),
+    prisma.patientProfile.findUnique({ where: { userId: session.user.id } }),
+  ]);
+
+  if (!user || !patientProfile) return null;
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    cpf: patientProfile.cpf,
+    insuranceName: patientProfile.insuranceName,
+    insuranceNumber: patientProfile.insuranceNumber,
+    emergencyContactName: patientProfile.emergencyContactName,
+    emergencyContactPhone: patientProfile.emergencyContactPhone,
+  };
 }
 
 export async function signOutPatient() {
-  await clearPatientSessionCookie();
+  await signOut({ redirectTo: "/" });
 }
