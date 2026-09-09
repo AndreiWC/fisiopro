@@ -2,12 +2,24 @@
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getActiveOrganization } from "@/lib/organization";
 import { redirect } from "next/navigation";
+
+function isSafeNext(next?: string): next is string {
+  return Boolean(next) && next!.startsWith("/") && !next!.startsWith("//");
+}
 
 export async function chooseClinicRole() {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
+  }
+
+  // Guarda de idempotência: cliques duplicados/retries não devem criar uma segunda
+  // Organization+Membership para quem já escolheu esse papel.
+  const existingOrganization = await getActiveOrganization();
+  if (existingOrganization) {
+    redirect("/dashboard");
   }
 
   const organization = await prisma.organization.create({ data: {} });
@@ -40,5 +52,5 @@ export async function choosePatientRole(next?: string) {
     data: { userId: session.user.id },
   });
 
-  redirect(next && next.startsWith("/") ? next : "/perfil");
+  redirect(isSafeNext(next) ? next : "/perfil");
 }

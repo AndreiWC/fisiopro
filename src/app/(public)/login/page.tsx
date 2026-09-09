@@ -29,7 +29,8 @@ export default async function LoginPage({
     redirect("/dashboard");
   }
   if (patientProfile) {
-    redirect(next && next.startsWith("/") ? next : "/perfil");
+    const safeNext = next && next.startsWith("/") && !next.startsWith("//");
+    redirect(safeNext ? next : "/perfil");
   }
 
   return (

@@ -1,9 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import { Stethoscope, User } from "lucide-react";
 import { chooseClinicRole, choosePatientRole } from "../_actions/choose-role";
 
 export function RoleChooser({ next }: { next?: string }) {
+  const [pending, setPending] = useState(false);
+
+  function handleChooseClinic() {
+    if (pending) return;
+    setPending(true);
+    void chooseClinicRole();
+  }
+
+  function handleChoosePatient() {
+    if (pending) return;
+    setPending(true);
+    void choosePatientRole(next);
+  }
+
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold text-foreground">Quase lá</h1>
@@ -12,8 +27,9 @@ export function RoleChooser({ next }: { next?: string }) {
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <button
           type="button"
-          onClick={() => void chooseClinicRole()}
-          className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/50 hover:bg-secondary/40"
+          onClick={handleChooseClinic}
+          disabled={pending}
+          className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/50 hover:bg-secondary/40 disabled:pointer-events-none disabled:opacity-60"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Stethoscope className="h-5 w-5" />
@@ -25,8 +41,9 @@ export function RoleChooser({ next }: { next?: string }) {
         </button>
         <button
           type="button"
-          onClick={() => void choosePatientRole(next)}
-          className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/50 hover:bg-secondary/40"
+          onClick={handleChoosePatient}
+          disabled={pending}
+          className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/50 hover:bg-secondary/40 disabled:pointer-events-none disabled:opacity-60"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <User className="h-5 w-5" />

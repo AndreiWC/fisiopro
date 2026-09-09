@@ -7,7 +7,8 @@ import { requestLoginCode } from "@/lib/patient-otp";
 type LoginType = "google" | "github";
 
 function loginRedirect(next?: string) {
-  return next && next.startsWith("/") ? `/login?next=${encodeURIComponent(next)}` : "/login";
+  const safeNext = next && next.startsWith("/") && !next.startsWith("//");
+  return safeNext ? `/login?next=${encodeURIComponent(next)}` : "/login";
 }
 
 export async function handleRegister(provider: LoginType, next?: string) {
