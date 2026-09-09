@@ -2,10 +2,10 @@
 
 import prisma from "@/lib/prisma";
 
-export async function getPatientStats(email: string) {
+export async function getPatientStats(userId: string) {
   const appointments = await prisma.appointments.findMany({
-    where: { email: { equals: email, mode: "insensitive" } },
-    select: { status: true, userId: true, AppointmentDate: true },
+    where: { customer: { userId } },
+    select: { status: true, organizationId: true, AppointmentDate: true },
   });
 
   const today = new Date();
@@ -18,7 +18,7 @@ export async function getPatientStats(email: string) {
       (a.status === "CONFIRMED" || a.status === "IN_PROGRESS") &&
       a.AppointmentDate >= today,
   ).length;
-  const activeClinics = new Set(appointments.map((a) => a.userId)).size;
+  const activeClinics = new Set(appointments.map((a) => a.organizationId)).size;
 
   const attendanceDenominator = sessionsCompleted + noShowCount;
   const attendanceRate =

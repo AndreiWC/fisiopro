@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
-import type { Patient } from "@prisma/client";
+import type { CurrentPatient } from "../../_actions/patient-auth";
 import { formatPhone, formatCpf } from "@/utils/formatPhone";
 import { updatePatientProfile } from "../_actions/update-patient-profile";
 import { signOutPatient } from "../../_actions/patient-auth";
@@ -18,7 +18,7 @@ interface PatientStats {
 }
 
 interface ProfileContentProps {
-  patient: Patient;
+  patient: CurrentPatient;
   stats: PatientStats;
 }
 
