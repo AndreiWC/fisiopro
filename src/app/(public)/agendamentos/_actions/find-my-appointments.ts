@@ -2,12 +2,12 @@
 
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import { getPatientSessionData } from "@/lib/patient-session";
+import { auth } from "@/lib/auth";
 
 export type MyAppointment = Prisma.AppointmentsGetPayload<{
   include: {
     service: true;
-    user: {
+    organization: {
       select: {
         id: true;
         name: true;
@@ -21,19 +21,17 @@ export type MyAppointment = Prisma.AppointmentsGetPayload<{
 }>;
 
 export async function findMyAppointments() {
-  const session = await getPatientSessionData();
-  if (!session) {
+  const session = await auth();
+  if (!session?.user?.id) {
     return { error: "Sessão expirada. Entre novamente." };
   }
 
   try {
     const appointments = await prisma.appointments.findMany({
-      where: {
-        email: { equals: session.email, mode: "insensitive" },
-      },
+      where: { customer: { userId: session.user.id } },
       include: {
         service: true,
-        user: {
+        organization: {
           select: { id: true, name: true, image: true, phone: true, times: true, timezone: true },
         },
       },

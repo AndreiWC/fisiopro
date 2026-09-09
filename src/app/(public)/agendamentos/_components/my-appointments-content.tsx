@@ -167,9 +167,9 @@ export function MyAppointmentsContent({ initialAppointments }: MyAppointmentsCon
             <ul className="mt-4 space-y-3">
               {list.map((appointment) => {
                 const meta = APPOINTMENT_STATUS_META[appointment.status];
-                const whatsappLink = appointment.user.phone
+                const whatsappLink = appointment.organization.phone
                   ? buildWhatsAppLink(
-                      appointment.user.phone,
+                      appointment.organization.phone,
                       `Olá! Sou paciente e agendei ${appointment.service.name} para ${format(
                         new Date(appointment.AppointmentDate),
                         "dd/MM",
@@ -192,7 +192,7 @@ export function MyAppointmentsContent({ initialAppointments }: MyAppointmentsCon
                         </p>
                         <p className="flex items-center gap-1 truncate text-sm text-muted-foreground">
                           <MapPin className="h-3.5 w-3.5 shrink-0" />
-                          {appointment.user.name}
+                          {appointment.organization.name}
                         </p>
                       </div>
                       <span
@@ -229,7 +229,7 @@ export function MyAppointmentsContent({ initialAppointments }: MyAppointmentsCon
                               </a>
                             ) : (
                               <Link
-                                href={`/clinica/${appointment.user.id}`}
+                                href={`/clinica/${appointment.organization.id}`}
                                 className="flex-1 rounded-full bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                               >
                                 Ver clínica
@@ -270,13 +270,13 @@ export function MyAppointmentsContent({ initialAppointments }: MyAppointmentsCon
                         appointment.status === "NO_SHOW") && (
                         <div className="flex gap-2">
                           <Link
-                            href={`/clinica/${appointment.user.id}`}
+                            href={`/clinica/${appointment.organization.id}`}
                             className="flex-1 rounded-full bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                           >
                             Repetir
                           </Link>
                           <Link
-                            href={`/clinica/${appointment.user.id}`}
+                            href={`/clinica/${appointment.organization.id}`}
                             className="flex-1 rounded-full border border-border px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-secondary"
                           >
                             Ver clínica
