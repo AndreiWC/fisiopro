@@ -20,7 +20,7 @@ export async function createSubscription({ type }: CreateSubscriptionProps) {
 
   const organization = await requireActiveOrganization();
 
-  let customerId = organization.stripe_customer_id;
+  let customerId = organization.stripe_customer_id ?? undefined;
 
   if (!customerId) {
     const customer = await stripe.customers.create({
