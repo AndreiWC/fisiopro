@@ -3,6 +3,7 @@
 import Prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function updateProfileAvatar({
   avatarUrl,
@@ -22,10 +23,15 @@ export async function updateProfileAvatar({
     };
   }
 
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
+  }
+
   try {
-    await Prisma.user.update({
+    await Prisma.organization.update({
       where: {
-        id: session?.user?.id,
+        id: organization.id,
       },
       data: {
         image: avatarUrl,

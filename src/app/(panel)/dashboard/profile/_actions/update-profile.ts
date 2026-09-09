@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { Segment } from "@prisma/client";
+import { getActiveOrganization } from "@/lib/organization";
 
 const formShema = z.object({
   name: z.string().min(1, { message: "O nome é obrigatório" }),
@@ -22,17 +23,22 @@ type formShema = z.infer<typeof formShema>;
 export async function updateProfileAction(formData: formShema) {
   const session = await auth();
   if (!session?.user?.id) {
-    error: "Usuário não autenticado";
+    return { error: "Usuário não autenticado" };
   }
 
   const schema = formShema.safeParse(formData);
   if (!schema.success) {
-    error: "Dados inválidos";
+    return { error: "Dados inválidos" };
+  }
+
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
   }
 
   try {
-    const updatedUser = await prisma.user.update({
-      where: { id: session?.user?.id },
+    await prisma.organization.update({
+      where: { id: organization.id },
       data: {
         name: formData.name,
         address: formData.address,

@@ -33,7 +33,7 @@ import { Prisma } from "@prisma/client";
 import { updateProfileAction } from "../_actions/update-profile";
 import { toast } from "sonner";
 import { formatPhone } from "@/utils/formatPhone";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AvatarProfile } from "./profile-avatar";
@@ -42,14 +42,14 @@ import { subscriptionPlans } from "@/utils/plans/index";
 import { ProfileOverview } from "./profile-overview";
 import type { ProfileOverview as ProfileOverviewData } from "../_data-access/get-profile-overview";
 
-type UserWithSubscription = Prisma.UserGetPayload<{
+type OrganizationWithSubscription = Prisma.OrganizationGetPayload<{
   include: {
     subscription: true;
   };
 }>;
 
 interface ProfileContentProps {
-  user: UserWithSubscription;
+  organization: OrganizationWithSubscription;
   overview: ProfileOverviewData;
 }
 
@@ -84,11 +84,10 @@ function initials(name: string | null) {
   return (first + last).toUpperCase();
 }
 
-export function ProfileContent({ user, overview }: ProfileContentProps) {
+export function ProfileContent({ organization, overview }: ProfileContentProps) {
   //controla abertura do dialog
   const [DialogOpen, setDialogOpen] = useState(false);
-  const [selectedTime, setSelectedTime] = useState<string[]>(user.times ?? []);
-  const { update } = useSession();
+  const [selectedTime, setSelectedTime] = useState<string[]>(organization.times ?? []);
   const router = useRouter();
   //função de selecionar e desselecionar os horários
   function toggleTimeSelection(time: string) {
@@ -111,13 +110,13 @@ export function ProfileContent({ user, overview }: ProfileContentProps) {
   );
 
   const form = useProfileForm({
-    name: user.name,
-    address: user.address,
-    phone: user.phone,
-    status: user.status,
-    segment: user.segment,
-    professionalRegistration: user.professionalRegistration,
-    timeZone: user.timezone,
+    name: organization.name,
+    address: organization.address,
+    phone: organization.phone,
+    status: organization.status,
+    segment: organization.segment,
+    professionalRegistration: organization.professionalRegistration,
+    timeZone: organization.timezone,
   });
 
   async function onSubmit(value: ProfileFormData) {
@@ -142,16 +141,15 @@ export function ProfileContent({ user, overview }: ProfileContentProps) {
 
   async function handleSignOut() {
     await signOut();
-    await update();
     router.replace("/");
   }
 
-  const planInfo = user.subscription
-    ? subscriptionPlans.find((p) => p.id === user.subscription!.plan)
+  const planInfo = organization.subscription
+    ? subscriptionPlans.find((p) => p.id === organization.subscription!.plan)
     : null;
-  const statusMeta = user.subscription
-    ? (SUBSCRIPTION_STATUS_LABELS[user.subscription.status] ?? {
-        label: user.subscription.status,
+  const statusMeta = organization.subscription
+    ? (SUBSCRIPTION_STATUS_LABELS[organization.subscription.status] ?? {
+        label: organization.subscription.status,
         className: "bg-muted text-muted-foreground",
       })
     : null;
@@ -170,26 +168,26 @@ export function ProfileContent({ user, overview }: ProfileContentProps) {
         </svg>
 
         <div className="relative flex items-center gap-4">
-          <AvatarProfile avatarUrl={user.image} userId={user.id} sizeClassName="h-20 w-20 shrink-0" />
+          <AvatarProfile avatarUrl={organization.image} organizationId={organization.id} sizeClassName="h-20 w-20 shrink-0" />
           <div className="min-w-0">
             <h1 className="font-display truncate text-xl font-semibold text-foreground">
-              {user.name || "Complete seu perfil"}
+              {organization.name || "Complete seu perfil"}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              {segmentLabel(user.segment) && (
+              {segmentLabel(organization.segment) && (
                 <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
-                  {segmentLabel(user.segment)}
+                  {segmentLabel(organization.segment)}
                 </span>
               )}
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-xs font-medium",
-                  user.status
+                  organization.status
                     ? "bg-primary/10 text-primary"
                     : "bg-destructive/10 text-destructive",
                 )}
               >
-                {user.status ? "Aberta" : "Fechada"}
+                {organization.status ? "Aberta" : "Fechada"}
               </span>
             </div>
           </div>
