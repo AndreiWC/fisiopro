@@ -9,7 +9,7 @@ const formSchema = z.object({
   date: z.date(),
   serviceId: z.string().min(1, "O serviço é obrigatório"),
   time: z.string().min(1, "O horário é obrigatório"),
-  clinicId: z.string().min(1, "A clínica é obrigatória"),
+  organizationId: z.string().min(1, "A clínica é obrigatória"),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -33,13 +33,13 @@ export async function createNewAppointment(formData: FormSchema) {
 
     const customer = await prisma.customer.upsert({
       where: {
-        userId_email: { userId: formData.clinicId, email: formData.email },
+        organizationId_email: { organizationId: formData.organizationId, email: formData.email },
       },
       create: {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        userId: formData.clinicId,
+        organizationId: formData.organizationId,
       },
       update: {
         name: formData.name,
@@ -49,18 +49,13 @@ export async function createNewAppointment(formData: FormSchema) {
 
     const newAppointment = await prisma.appointments.create({
       data: {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
         time: formData.time,
         AppointmentDate: appointmentDate,
-
-        // ✅ RELATIONS CORRETAS
         service: {
           connect: { id: formData.serviceId },
         },
-        user: {
-          connect: { id: formData.clinicId },
+        organization: {
+          connect: { id: formData.organizationId },
         },
         customer: {
           connect: { id: customer.id },

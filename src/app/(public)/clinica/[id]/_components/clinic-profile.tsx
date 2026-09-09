@@ -13,7 +13,7 @@ import { isSlotInThePast } from "@/utils/schedule-utils";
 import { Header } from "../../../_components/header";
 import { BottomNav } from "../../../_components/bottom-nav";
 
-type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
+type OrganizationWithServiceAndSubscriptions = Prisma.OrganizationGetPayload<{
   include: {
     services: true;
     subscription: true;
@@ -21,7 +21,7 @@ type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
 }>;
 
 interface ClinicProfileProps {
-  clinic: UserWithServiceAndSubscriptions;
+  clinic: OrganizationWithServiceAndSubscriptions;
   onSelectService: (serviceId: string) => void;
   onStartBooking: () => void;
 }

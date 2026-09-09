@@ -18,7 +18,7 @@ import { TimeSlot } from "@/utils/schedule-utils";
 import { StepIndicator } from "./step-indicator";
 import { cn } from "@/lib/utils";
 
-type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
+type OrganizationWithServiceAndSubscriptions = Prisma.OrganizationGetPayload<{
   include: {
     services: true;
     subscription: true;
@@ -26,7 +26,7 @@ type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
 }>;
 
 interface BookingWizardProps {
-  clinic: UserWithServiceAndSubscriptions;
+  clinic: OrganizationWithServiceAndSubscriptions;
   initialServiceId?: string;
   onDone: () => void;
   knownPatient?: { name: string | null; email: string | null; phone: string | null };
@@ -131,7 +131,7 @@ export function BookingWizard({ clinic, initialServiceId, onDone, knownPatient }
       date: formData.date,
       serviceId: formData.serviceId,
       time: selectedTime,
-      clinicId: clinic.id,
+      organizationId: clinic.id,
     });
 
     if (response.error) {
