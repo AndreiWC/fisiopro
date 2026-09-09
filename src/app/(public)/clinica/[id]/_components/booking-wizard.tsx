@@ -72,7 +72,7 @@ export function BookingWizard({ clinic, initialServiceId, onDone, knownPatient }
       try {
         const dateString = date.toISOString().split("T")[0];
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${dateString}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?organizationId=${clinic.id}&date=${dateString}`,
         );
         const json = await response.json();
         setLoadingSlots(false);

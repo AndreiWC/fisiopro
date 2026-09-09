@@ -58,7 +58,7 @@ export function RescheduleSheet({
     setLoadingSlots(true);
     setSelectedTime("");
     fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?userId=${appointment.organization.id}&date=${dateParam(date)}&excludeAppointmentId=${appointment.id}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?organizationId=${appointment.organization.id}&date=${dateParam(date)}&excludeAppointmentId=${appointment.id}`,
     )
       .then((res) => res.json())
       .then((blocked) => setBlockedTimes(Array.isArray(blocked) ? blocked : []))

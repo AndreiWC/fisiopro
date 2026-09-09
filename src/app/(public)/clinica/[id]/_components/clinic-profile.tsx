@@ -54,7 +54,7 @@ export function ClinicProfile({
     if (!clinic.status || clinic.times.length === 0) return;
 
     fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${todayDateParam()}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?organizationId=${clinic.id}&date=${todayDateParam()}`,
     )
       .then((res) => res.json())
       .then((blocked: unknown) => {

@@ -1,15 +1,13 @@
 import prisma from "@/lib/prisma";
-import { ok } from "assert";
 import { NextResponse, NextRequest } from "next/server";
-import { use } from "react";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
+  const organizationId = searchParams.get("organizationId");
   const dateParm = searchParams.get("date");
   const excludeAppointmentId = searchParams.get("excludeAppointmentId");
 
-  if (!userId || !dateParm || userId === "null" || dateParm === "null") {
+  if (!organizationId || !dateParm || organizationId === "null" || dateParm === "null") {
     return NextResponse.json(
       { error: "Nenhum agendamento encontrado" },
       { status: 400 },
@@ -21,20 +19,20 @@ export async function GET(request: NextRequest) {
     const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
     const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
-    const user = await prisma.user.findFirst({
-      where: { id: userId || undefined },
+    const organization = await prisma.organization.findFirst({
+      where: { id: organizationId || undefined },
     });
 
-    if (!user) {
+    if (!organization) {
       return NextResponse.json(
-        { error: "Usuário não encontrado" },
+        { error: "Organização não encontrada" },
         { status: 400 },
       );
     }
 
     const appointments = await prisma.appointments.findMany({
       where: {
-        userId: userId || undefined,
+        organizationId: organizationId || undefined,
         status: { not: "CANCELLED" },
         AppointmentDate: {
           gte: startDate,
@@ -50,11 +48,11 @@ export async function GET(request: NextRequest) {
     const blockSlotes = new Set<string>();
     for (const appointment of appointments) {
       const requiredSlots = Math.ceil(appointment.service.duration / 30);
-      const startIndex = user.times.indexOf(appointment.time);
+      const startIndex = organization.times.indexOf(appointment.time);
 
       if (startIndex !== -1) {
         for (let i = 0; i < requiredSlots; i++) {
-          const blockedSlot = user.times[startIndex + i];
+          const blockedSlot = organization.times[startIndex + i];
           if (blockedSlot) {
             blockSlotes.add(blockedSlot);
           }
