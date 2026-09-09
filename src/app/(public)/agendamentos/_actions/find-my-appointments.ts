@@ -39,7 +39,8 @@ export async function findMyAppointments() {
     });
 
     return { data: appointments };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return { error: "Erro ao buscar seus agendamentos" };
   }
 }

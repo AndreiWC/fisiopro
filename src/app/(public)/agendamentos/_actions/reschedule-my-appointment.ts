@@ -48,7 +48,8 @@ export async function rescheduleMyAppointment(formData: FormSchema) {
     });
 
     return { data: "Agendamento remarcado com sucesso!" };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return { error: "Erro ao remarcar agendamento" };
   }
 }

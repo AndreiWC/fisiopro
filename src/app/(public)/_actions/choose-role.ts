@@ -19,7 +19,9 @@ export async function chooseClinicRole() {
     redirect("/dashboard");
   }
 
-  const organization = await prisma.organization.create({ data: {} });
+  const organization = await prisma.organization.create({
+    data: { name: session.user.name ?? null, image: session.user.image ?? null },
+  });
   await prisma.membership.create({
     data: { userId: session.user.id, organizationId: organization.id, role: "OWNER" },
   });

@@ -17,6 +17,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function isSafeRedirectTarget(next: string | undefined | null): next is string {
   if (!next) return false
+  if (!next.startsWith("/")) return false
   try {
     const url = new URL(next, "http://localhost")
     return url.origin === "http://localhost"

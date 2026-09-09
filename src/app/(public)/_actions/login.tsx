@@ -19,7 +19,8 @@ export async function sendLoginCode(email: string) {
   try {
     await requestLoginCode(email);
     return { data: "Código enviado! Confira seu e-mail." };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return { error: "Não foi possível enviar o código agora. Tente novamente." };
   }
 }
@@ -27,7 +28,8 @@ export async function sendLoginCode(email: string) {
 export async function confirmLoginCode(email: string, code: string, next?: string) {
   try {
     await signIn("email-code", { email, code, redirect: false });
-  } catch {
+  } catch (err) {
+    console.error(err);
     return { error: "Código inválido ou expirado." };
   }
   // redirect() fora do try/catch: seu throw interno não pode ser tratado como erro.

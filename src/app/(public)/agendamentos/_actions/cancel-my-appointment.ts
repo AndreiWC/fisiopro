@@ -37,7 +37,8 @@ export async function cancelMyAppointment(formData: FormSchema) {
     });
 
     return { data: "Agendamento cancelado com sucesso!" };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return { error: "Erro ao cancelar agendamento" };
   }
 }

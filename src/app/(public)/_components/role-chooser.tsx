@@ -10,13 +10,19 @@ export function RoleChooser({ next }: { next?: string }) {
   function handleChooseClinic() {
     if (pending) return;
     setPending(true);
-    void chooseClinicRole();
+    chooseClinicRole().catch((err) => {
+      console.error(err);
+      setPending(false);
+    });
   }
 
   function handleChoosePatient() {
     if (pending) return;
     setPending(true);
-    void choosePatientRole(next);
+    choosePatientRole(next).catch((err) => {
+      console.error(err);
+      setPending(false);
+    });
   }
 
   return (
