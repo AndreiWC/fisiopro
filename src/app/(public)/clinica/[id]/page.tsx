@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getInfoSchedule } from "./_data-access/get-info-schedule";
+import { getInfoOrganizationSchedule } from "./_data-access/get-info-organization-schedule";
 import { ScheduleContent } from "./_components/schedule-content";
 import { getCurrentPatient } from "../../_actions/patient-auth";
 
@@ -8,13 +8,13 @@ export default async function SchedulePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const userId = (await params).id;
-  const [user, patient] = await Promise.all([
-    getInfoSchedule({ userId }),
+  const organizationId = (await params).id;
+  const [organization, patient] = await Promise.all([
+    getInfoOrganizationSchedule({ organizationId }),
     getCurrentPatient(),
   ]);
 
-  if (!user) {
+  if (!organization) {
     redirect("/");
   }
 
@@ -22,5 +22,5 @@ export default async function SchedulePage({
     ? { name: patient.name, email: patient.email, phone: patient.phone }
     : undefined;
 
-  return <ScheduleContent clinic={user} knownPatient={knownPatient} />;
+  return <ScheduleContent clinic={organization} knownPatient={knownPatient} />;
 }

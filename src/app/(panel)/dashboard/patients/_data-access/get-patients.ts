@@ -1,12 +1,12 @@
 "use server";
 import prisma from "@/lib/prisma";
 
-export async function getPatients({ userId }: { userId: string }) {
+export async function getPatients({ organizationId }: { organizationId: string }) {
   try {
-    if (!userId) return [];
+    if (!organizationId) return [];
 
     const customers = await prisma.customer.findMany({
-      where: { userId },
+      where: { organizationId },
       include: {
         appointments: {
           include: { service: true },

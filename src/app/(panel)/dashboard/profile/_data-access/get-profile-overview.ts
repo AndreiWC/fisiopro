@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import type { User } from "@prisma/client";
+import type { Organization } from "@prisma/client";
 
 export interface CompletionItem {
   label: string;
@@ -17,15 +17,15 @@ export interface ProfileOverview {
   completionPercent: number;
 }
 
-export async function getProfileOverview(userId: string): Promise<ProfileOverview> {
-  const [user, customers, appointments, servicesCount] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId } }),
-    prisma.customer.findMany({ where: { userId }, select: { treatmentStatus: true } }),
+export async function getProfileOverview(organizationId: string): Promise<ProfileOverview> {
+  const [organization, customers, appointments, servicesCount] = await Promise.all([
+    prisma.organization.findUnique({ where: { id: organizationId } }),
+    prisma.customer.findMany({ where: { organizationId }, select: { treatmentStatus: true } }),
     prisma.appointments.findMany({
-      where: { userId },
+      where: { organizationId },
       select: { status: true },
     }),
-    prisma.service.count({ where: { userId, status: true } }),
+    prisma.service.count({ where: { organizationId, status: true } }),
   ]);
 
   const activePatients = customers.filter((c) => c.treatmentStatus === "EM_TRATAMENTO").length;
@@ -35,7 +35,7 @@ export async function getProfileOverview(userId: string): Promise<ProfileOvervie
   const noShowRate =
     noShowDenominator > 0 ? Math.round((noShowCount / noShowDenominator) * 100) : null;
 
-  const completion = buildCompletionChecklist(user, servicesCount);
+  const completion = buildCompletionChecklist(organization, servicesCount);
   const completionPercent = Math.round(
     (completion.filter((item) => item.done).length / completion.length) * 100,
   );
@@ -51,16 +51,16 @@ export async function getProfileOverview(userId: string): Promise<ProfileOvervie
 }
 
 function buildCompletionChecklist(
-  user: User | null,
+  organization: Organization | null,
   servicesCount: number,
 ): CompletionItem[] {
   return [
-    { label: "Foto de perfil", done: Boolean(user?.image) },
-    { label: "Endereço da clínica", done: Boolean(user?.address) },
-    { label: "Telefone de contato", done: Boolean(user?.phone) },
-    { label: "Segmento do negócio", done: Boolean(user?.segment) },
-    { label: "Registro profissional", done: Boolean(user?.professionalRegistration) },
+    { label: "Foto de perfil", done: Boolean(organization?.image) },
+    { label: "Endereço da clínica", done: Boolean(organization?.address) },
+    { label: "Telefone de contato", done: Boolean(organization?.phone) },
+    { label: "Segmento do negócio", done: Boolean(organization?.segment) },
+    { label: "Registro profissional", done: Boolean(organization?.professionalRegistration) },
     { label: "Pelo menos um serviço ativo", done: servicesCount > 0 },
-    { label: "Horários de atendimento", done: (user?.times.length ?? 0) > 0 },
+    { label: "Horários de atendimento", done: (organization?.times.length ?? 0) > 0 },
   ];
 }

@@ -1,8 +1,11 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getActiveOrganization } from "@/lib/organization";
+
 const formSchema = z.object({
   reminderId: z.string().min(1, "O ID do lembrete é obrigatório"),
 });
@@ -17,10 +20,21 @@ export async function deleteReminder(formData: FormSchema) {
     };
   }
 
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: "Usuário não autenticado" };
+  }
+
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
+  }
+
   try {
     await prisma.reminder.delete({
       where: {
         id: formData.reminderId,
+        organizationId: organization.id,
       },
     });
 

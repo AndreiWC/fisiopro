@@ -1,22 +1,21 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { error } from "console";
 
 // roda no lado servidor
 
-export async function getAllServices({ userId }: { userId: string }) {
+export async function getAllServices({ organizationId }: { organizationId: string }) {
   //lógica para buscar todos os serviços no banco de dados
 
-  if (!userId) {
+  if (!organizationId) {
     return {
-      error: "Usuário não autenticado",
+      error: "Nenhuma organização vinculada à sua conta",
     };
   }
 
   try {
     const services = await prisma.service.findMany({
       where: {
-        userId: userId,
+        organizationId: organizationId,
         status: true,
       },
     });

@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getActiveOrganization } from "@/lib/organization";
 
 const formSchema = z.object({
   description: z.string().min(1, "A descrição do lembrete é obrigatória"),
@@ -27,11 +28,16 @@ export async function createReminder(formData: FormSchema) {
     };
   }
 
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
+  }
+
   try {
-    const reminder = await prisma.reminder.create({
+    await prisma.reminder.create({
       data: {
         description: formData.description,
-        userId: session?.user?.id,
+        organizationId: organization.id,
       },
     });
     revalidatePath("/dashboard");

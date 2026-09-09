@@ -13,7 +13,7 @@ import { isSlotInThePast } from "@/utils/schedule-utils";
 import { Header } from "../../../_components/header";
 import { BottomNav } from "../../../_components/bottom-nav";
 
-type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
+type OrganizationWithServiceAndSubscriptions = Prisma.OrganizationGetPayload<{
   include: {
     services: true;
     subscription: true;
@@ -21,7 +21,7 @@ type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
 }>;
 
 interface ClinicProfileProps {
-  clinic: UserWithServiceAndSubscriptions;
+  clinic: OrganizationWithServiceAndSubscriptions;
   onSelectService: (serviceId: string) => void;
   onStartBooking: () => void;
 }
@@ -54,7 +54,7 @@ export function ClinicProfile({
     if (!clinic.status || clinic.times.length === 0) return;
 
     fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${todayDateParam()}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?organizationId=${clinic.id}&date=${todayDateParam()}`,
     )
       .then((res) => res.json())
       .then((blocked: unknown) => {

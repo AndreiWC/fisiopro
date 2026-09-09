@@ -2,30 +2,24 @@
 import prisma from "@/lib/prisma";
 import { addDays, differenceInDays, isAfter } from "date-fns";
 import { TRIAL_PERIOD_DAYS } from "@/utils/permissions/trial-limits";
+import { requireActiveOrganization } from "@/lib/organization";
 
-export async function checkSubscription(userId: string) {
-  const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-    include: {
-      subscription: true,
-    },
+export async function checkSubscription() {
+  const organization = await requireActiveOrganization();
+
+  const subscription = await prisma.subscription.findUnique({
+    where: { organizationId: organization.id },
   });
 
-  if (!user) {
-    throw new Error("Usuário não encontrado");
-  }
-
-  if (user.subscription && user.subscription.status === "active") {
+  if (subscription && subscription.status === "active") {
     return {
       subscriptionStatus: "active",
       message: "Assinatura ativa. Acesso completo aos recursos.",
-      planId: user.subscription.plan,
+      planId: subscription.plan,
     };
   }
 
-  const trialEndDate = addDays(user.createdAt, TRIAL_PERIOD_DAYS);
+  const trialEndDate = addDays(organization.createdAt, TRIAL_PERIOD_DAYS);
 
   if (isAfter(new Date(), trialEndDate)) {
     return {

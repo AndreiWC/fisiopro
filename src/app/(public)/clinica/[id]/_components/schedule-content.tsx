@@ -5,7 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { ClinicProfile } from "./clinic-profile";
 import { BookingWizard } from "./booking-wizard";
 
-type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
+type OrganizationWithServiceAndSubscriptions = Prisma.OrganizationGetPayload<{
   include: {
     services: true;
     subscription: true;
@@ -13,7 +13,7 @@ type UserWithServiceAndSubscriptions = Prisma.UserGetPayload<{
 }>;
 
 interface ScheduleContentProps {
-  clinic: UserWithServiceAndSubscriptions;
+  clinic: OrganizationWithServiceAndSubscriptions;
   knownPatient?: { name: string | null; email: string | null; phone: string | null };
 }
 

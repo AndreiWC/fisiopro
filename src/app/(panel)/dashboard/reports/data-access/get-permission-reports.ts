@@ -1,23 +1,23 @@
-"use service";
+"use server";
 
 import prisma from "@/lib/prisma";
 
-export async function getPermissionUserToReports({
-  userId,
+export async function getPermissionOrganizationToReports({
+  organizationId,
 }: {
-  userId: string;
+  organizationId: string;
 }) {
-  const user = await prisma.user.findFirst({
+  const organization = await prisma.organization.findFirst({
     where: {
-      id: userId,
+      id: organizationId,
     },
     include: {
       subscription: true,
     },
   });
 
-  if (!user?.subscription || user.subscription.plan !== "PROFESSIONAL") {
+  if (!organization?.subscription || organization.subscription.plan !== "PROFESSIONAL") {
     return null;
   }
-  return user;
+  return organization;
 }

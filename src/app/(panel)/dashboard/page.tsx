@@ -8,13 +8,16 @@ import { Reminders } from "./_components/reminder/reminders";
 import { Appointments } from "./_components/appointments/appointments";
 import { checkSubscription } from "@/utils/permissions/checkSubscripion";
 import { LabelSubscription } from "@/components/ui/label-subscription";
+import { requireActiveOrganization } from "@/lib/organization";
+
 export default async function Dashboard() {
   const session = await getSession();
   if (!session) {
     redirect("/");
   }
 
-  const subscription = await checkSubscription(session?.user?.id!);
+  const organization = await requireActiveOrganization();
+  const subscription = await checkSubscription();
 
   return (
     <main>
@@ -29,14 +32,14 @@ export default async function Dashboard() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href={`/clinica/${session.user.id}`} target="_blank">
+          <Link href={`/clinica/${organization.id}`} target="_blank">
             <Button className="flex-1 md:flex-[0]">
               <Calendar className="w-5 h-5" />
               <span>Novo agendamento</span>
             </Button>
           </Link>
 
-          <ButtonCopyLink userId={session.user.id!} />
+          <ButtonCopyLink organizationId={organization.id} />
         </div>
       </div>
 
@@ -55,8 +58,8 @@ export default async function Dashboard() {
 
       {subscription?.subscriptionStatus !== "EXPIRED" && (
         <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Appointments userId={session.user.id!} />
-          <Reminders userId={session.user.id!} />
+          <Appointments organizationId={organization.id} />
+          <Reminders organizationId={organization.id} />
         </section>
       )}
     </main>

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { stripe } from "@/utils/stripe";
 import Prisma from "@/lib/prisma";
 import { Plan } from "@prisma/client";
+import { getActiveOrganization } from "@/lib/organization";
 
 interface CreateSubscriptionProps {
   type: Plan;
@@ -10,47 +11,36 @@ interface CreateSubscriptionProps {
 
 export async function createSubscription({ type }: CreateSubscriptionProps) {
   const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
+  if (!session?.user?.id) {
     return {
       sessionId: "",
       error: "Usuário não autenticado. Faça login para continuar.",
     };
   }
 
-  const findUser = await Prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!findUser) {
-    return {
-      sessionId: "",
-      error: "Usuário não encontrado.",
-    };
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { sessionId: "", error: "Nenhuma organização vinculada à sua conta" };
   }
 
-  let customerId = findUser.stripe_customer_id;
+  let customerId = organization.stripe_customer_id ?? undefined;
 
   if (!customerId) {
     const customer = await stripe.customers.create({
-      email: findUser.email,
+      email: session.user.email ?? undefined,
+      name: organization.name ?? undefined,
     });
 
     customerId = customer.id;
 
-    await Prisma.user.update({
+    await Prisma.organization.update({
       where: {
-        id: userId,
+        id: organization.id,
       },
       data: {
         stripe_customer_id: customerId,
       },
     });
-
-    customerId = customer.id;
   }
 
   try {
@@ -86,6 +76,4 @@ export async function createSubscription({ type }: CreateSubscriptionProps) {
       error: "Falha ao criar a sessão de checkout. Tente novamente." + error,
     };
   }
-
- 
 }

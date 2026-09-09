@@ -20,7 +20,7 @@ import { SEGMENT_OPTIONS } from "@/utils/segments";
 import { cn } from "@/lib/utils";
 import { PremiumBadge } from "./premium-badge";
 
-type UserWithSubscription = Prisma.UserGetPayload<{
+type OrganizationWithServiceAndSubscriptions = Prisma.OrganizationGetPayload<{
   include: {
     subscription: true;
     services: { select: { name: true } };
@@ -28,7 +28,7 @@ type UserWithSubscription = Prisma.UserGetPayload<{
 }>;
 
 interface PatientDiscoveryProps {
-  professionals: UserWithSubscription[];
+  professionals: OrganizationWithServiceAndSubscriptions[];
 }
 
 const SEGMENT_ICONS: Record<Segment, typeof Scissors> = {
@@ -40,7 +40,7 @@ const SEGMENT_ICONS: Record<Segment, typeof Scissors> = {
   MEDICO: Stethoscope,
 };
 
-function isFeatured(professional: UserWithSubscription) {
+function isFeatured(professional: OrganizationWithServiceAndSubscriptions) {
   return (
     professional.subscription?.status === "active" &&
     professional.subscription?.plan === "PROFESSIONAL"

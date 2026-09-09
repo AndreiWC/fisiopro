@@ -1,14 +1,14 @@
 "use server";
 
-import { Session } from "next-auth";
+import { Organization } from "@prisma/client";
 import { addDays, isAfter } from "date-fns";
 import { ResultPermissionsProps } from "./canPermissions";
 import { TRIAL_PERIOD_DAYS } from "./trial-limits";
 
 export async function checkSubscriptionExpired(
-  session: Session,
+  organization: Organization,
 ): Promise<ResultPermissionsProps> {
-  const trailEndDate = addDays(session?.user?.createdAt, TRIAL_PERIOD_DAYS);
+  const trailEndDate = addDays(organization.createdAt, TRIAL_PERIOD_DAYS);
 
   if (isAfter(new Date(), trailEndDate)) {
     return {

@@ -1,19 +1,20 @@
 import { redirect } from "next/navigation";
-import { getPermissionUserToReports } from "./data-access/get-permission-reports";
+import { getPermissionOrganizationToReports } from "./data-access/get-permission-reports";
 import getSession from "@/lib/getSession";
+import { requireActiveOrganization } from "@/lib/organization";
 
 export default async function Reports() {
-
   const session = await getSession();
   if (!session) {
     redirect("/");
   }
 
-  const user = await getPermissionUserToReports({
-    userId: session.user.id,
+  const organization = await requireActiveOrganization();
+  const allowed = await getPermissionOrganizationToReports({
+    organizationId: organization.id,
   });
 
-  if (!user) {
+  if (!allowed) {
    return (
     <main>
       <h1>Sem permissão de acesso ao Relatórios</h1>

@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
@@ -9,7 +10,7 @@ const formSchema = z.object({
   date: z.date(),
   serviceId: z.string().min(1, "O serviço é obrigatório"),
   time: z.string().min(1, "O horário é obrigatório"),
-  clinicId: z.string().min(1, "A clínica é obrigatória"),
+  organizationId: z.string().min(1, "A clínica é obrigatória"),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -23,6 +24,8 @@ export async function createNewAppointment(formData: FormSchema) {
     };
   }
 
+  const session = await auth();
+
   try {
     const selectedDate = new Date(formData.date);
     const year = selectedDate.getFullYear();
@@ -31,36 +34,47 @@ export async function createNewAppointment(formData: FormSchema) {
 
     const appointmentDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0)); // Cria a data no formato UTC
 
+    const service = await prisma.service.findFirst({
+      where: {
+        id: formData.serviceId,
+        organizationId: formData.organizationId,
+        status: true,
+      },
+    });
+
+    if (!service) {
+      return {
+        error: "Serviço não encontrado para esta clínica",
+      };
+    }
+
     const customer = await prisma.customer.upsert({
       where: {
-        userId_email: { userId: formData.clinicId, email: formData.email },
+        organizationId_email: { organizationId: formData.organizationId, email: formData.email },
       },
       create: {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        userId: formData.clinicId,
+        organizationId: formData.organizationId,
+        userId: session?.user?.id,
       },
       update: {
         name: formData.name,
         phone: formData.phone,
+        userId: session?.user?.id,
       },
     });
 
     const newAppointment = await prisma.appointments.create({
       data: {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
         time: formData.time,
         AppointmentDate: appointmentDate,
-
-        // ✅ RELATIONS CORRETAS
         service: {
           connect: { id: formData.serviceId },
         },
-        user: {
-          connect: { id: formData.clinicId },
+        organization: {
+          connect: { id: formData.organizationId },
         },
         customer: {
           connect: { id: customer.id },

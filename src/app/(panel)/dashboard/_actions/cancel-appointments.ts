@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getActiveOrganization } from "@/lib/organization";
 
 const formSchema = z.object({
   appointmentId: z.string().min(1, "O ID do agendamento é obrigatório"),
@@ -26,11 +27,16 @@ export async function cancelAppointment(formData: FormSchema) {
     };
   }
 
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
+  }
+
   try {
     await prisma.appointments.update({
       where: {
         id: formData.appointmentId,
-        userId: session?.user?.id,
+        organizationId: organization.id,
       },
       data: {
         status: "CANCELLED",

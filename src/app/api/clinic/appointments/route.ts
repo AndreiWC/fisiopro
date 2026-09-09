@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
 import prisma from "@/lib/prisma";
+import { getActiveOrganization } from "@/lib/organization";
 
 export const GET = auth(async function GET(request) {
   if (!request.auth) {
@@ -12,15 +13,15 @@ export const GET = auth(async function GET(request) {
   }
   const searchParams = request.nextUrl.searchParams;
   const dateString = searchParams.get("date") as string;
-  const clinicId = request.auth?.user?.id;
 
   if (!dateString) {
     return NextResponse.json({ error: "Data não encontrada" }, { status: 400 });
   }
 
-  if (!clinicId) {
+  const organization = await getActiveOrganization();
+  if (!organization) {
     return NextResponse.json(
-      { error: "Usuário não encontrado" },
+      { error: "Nenhuma organização vinculada à conta" },
       { status: 400 },
     );
   }
@@ -32,7 +33,7 @@ export const GET = auth(async function GET(request) {
 
     const appointments = await prisma.appointments.findMany({
       where: {
-        userId: clinicId,
+        organizationId: organization.id,
         status: { not: "CANCELLED" },
         AppointmentDate: {
           gte: startDate,
@@ -41,6 +42,7 @@ export const GET = auth(async function GET(request) {
       },
       include: {
         service: true,
+        customer: true,
       },
     });
 

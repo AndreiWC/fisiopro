@@ -5,38 +5,32 @@ import semFoto from "../../../../../../public/profissional em branco.png";
 import { Loader, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { updateProfileAvatar } from "../_actions/update-avatar";
-import { useSession } from "next-auth/react";
+
 interface AvatarProfileProps {
   avatarUrl: string | null;
-  userId: string;
+  organizationId: string;
   sizeClassName?: string;
 }
 
 export function AvatarProfile({
   avatarUrl,
-  userId,
+  organizationId,
   sizeClassName = "w-40 h-40",
 }: AvatarProfileProps) {
   const [previewImage, setPreviewImage] = useState(avatarUrl);
   const [loading, setLoading] = useState(false);
-  const { update } = useSession();
-  async function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    // (X) Criar o componente
-    // (X) Receber a imagem de troca.
-    // Enviar a imagem para o servidor (storage)
-    // Receber a url da imagem do servidor
-    // Salva a nova url da imagem no banco de dados
 
+  async function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
       setLoading(true);
       const image = e.target.files[0];
 
       if (image.type !== "image/jpeg" && image.type !== "image/png") {
-        toast.error("Formato de imagem inválido");
+        toast.error("Formato de imagem inválido");
         return;
       }
 
-      const newFilename = `${userId}`;
+      const newFilename = `${organizationId}`;
       const newFile = new File([image], newFilename, { type: image.type });
 
       const urlImage = await uploadImage(newFile);
@@ -48,9 +42,6 @@ export function AvatarProfile({
 
       setPreviewImage(urlImage);
       await updateProfileAvatar({ avatarUrl: urlImage });
-      await update({
-        image: urlImage,
-      });
       setLoading(false);
     }
   }
@@ -62,7 +53,7 @@ export function AvatarProfile({
       const formData = new FormData();
 
       formData.append("file", image);
-      formData.append("userId", userId);
+      formData.append("userId", organizationId);
 
       const response = await fetch(`/api/image/upload`, {
         method: "POST",
