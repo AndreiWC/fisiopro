@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { z } from "zod";
-import { getPatientSessionData } from "@/lib/patient-session";
+import { auth } from "@/lib/auth";
 
 const formSchema = z.object({
   appointmentId: z.string().min(1, "O ID do agendamento é obrigatório"),
@@ -18,19 +18,19 @@ export async function rescheduleMyAppointment(formData: FormSchema) {
     return { error: schema.error.issues[0].message };
   }
 
-  const session = await getPatientSessionData();
-  if (!session) {
+  const session = await auth();
+  if (!session?.user?.id) {
     return { error: "Sessão expirada. Entre novamente." };
   }
 
   try {
     const appointment = await prisma.appointments.findUnique({
       where: { id: formData.appointmentId },
-      select: { email: true, status: true },
+      select: { customer: { select: { userId: true } }, status: true },
     });
 
-    if (!appointment || appointment.email.toLowerCase() !== session.email.toLowerCase()) {
-      return { error: "Agendamento não encontrado para este e-mail" };
+    if (!appointment || appointment.customer.userId !== session.user.id) {
+      return { error: "Agendamento não encontrado para esta conta" };
     }
 
     if (appointment.status !== "CONFIRMED") {
@@ -48,7 +48,8 @@ export async function rescheduleMyAppointment(formData: FormSchema) {
     });
 
     return { data: "Agendamento remarcado com sucesso!" };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return { error: "Erro ao remarcar agendamento" };
   }
 }

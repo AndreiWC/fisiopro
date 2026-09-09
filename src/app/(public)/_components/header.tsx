@@ -12,9 +12,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LogIn, Menu, SettingsIcon, UserStar } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { Logo } from "@/components/brand/logo";
-import { getCurrentPatient } from "../_actions/patient-auth";
+import { getHeaderIdentity, type HeaderIdentity } from "../_actions/get-header-identity";
 
 function patientInitials(name: string | null) {
   if (!name) return "?";
@@ -25,17 +24,12 @@ function patientInitials(name: string | null) {
 }
 
 export function Header() {
-  const { data: session, status } = useSession();
   const [isOpen, seIsOpen] = useState(false);
-  const [patient, setPatient] = useState<{
-    name: string | null;
-    image: string | null;
-  } | null>(null);
+  const [identity, setIdentity] = useState<HeaderIdentity | null>(null);
 
   useEffect(() => {
-    if (session) return;
-    getCurrentPatient().then(setPatient);
-  }, [session]);
+    getHeaderIdentity().then(setIdentity);
+  }, []);
 
   const navItems = [{ href: "#profissionais", label: "Profissionais" }];
 
@@ -54,31 +48,31 @@ export function Header() {
         </Button>
       ))}
 
-      {status === "loading" ? (
+      {identity === null ? (
         <></>
-      ) : session ? (
+      ) : identity.role === "clinic" ? (
         <Link
           href="/dashboard"
           className="flex items-center justify-center gap-2 bg-primary text-primary-foreground py-1.5 rounded-md px-4 text-sm font-medium hover:bg-primary/90"
         >
           Acessar meu painel
         </Link>
-      ) : patient ? (
+      ) : identity.role === "patient" ? (
         <Link
           href="/perfil"
           onClick={() => seIsOpen(false)}
           className="flex items-center gap-2 rounded-full py-1 pr-3 pl-1 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
         >
-          {patient.image ? (
+          {identity.image ? (
             <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
-              <Image src={patient.image} alt="" fill sizes="28px" className="object-cover" />
+              <Image src={identity.image} alt="" fill sizes="28px" className="object-cover" />
             </span>
           ) : (
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-              {patientInitials(patient.name)}
+              {patientInitials(identity.name)}
             </span>
           )}
-          {patient.name?.split(" ")[0] ?? "Meu perfil"}
+          {identity.name?.split(" ")[0] ?? "Meu perfil"}
         </Link>
       ) : (
         <Button asChild onClick={() => seIsOpen(false)}>

@@ -9,7 +9,7 @@ import { ProfileContent } from "./_components/profile-content";
 export default async function PerfilPage() {
   const patient = await getCurrentPatient();
   const stats = patient
-    ? await getPatientStats(patient.email)
+    ? await getPatientStats(patient.id)
     : { sessionsCompleted: 0, activeAppointments: 0, activeClinics: 0, attendanceRate: null };
 
   return (

@@ -7,220 +7,252 @@
 generator client {
   provider = "prisma-client-js"
 }
-  
+
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Appointments{
-id            String	@id @default(uuid())
-name          String?
-email         String
-phone         String? @default("")
-AppointmentDate DateTime
-time String
-status AppointmentStatus @default(CONFIRMED)
+model Appointments {
+  id              String            @id @default(uuid())
+  AppointmentDate DateTime
+  time            String
+  status          AppointmentStatus @default(CONFIRMED)
 
-serviceId String
-service Service @relation(fields:[serviceId], references:[id])
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
 
-userId String
-user User @relation(fields:[userId], references:[id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
-customerId String?
-customer Customer? @relation(fields:[customerId], references:[id])
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
 
-createdAt DateTime @default(now())
-updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Patient {
-	id        String   @id @default(cuid())
-	name      String?
-	email     String   @unique
-	phone     String?
-	image     String?
-	cpf       String?  @unique
+model PatientProfile {
+  id String @id @default(cuid())
 
-	insuranceName   String?
-	insuranceNumber String?
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-	emergencyContactName  String?
-	emergencyContactPhone String?
+  cpf                   String? @unique
+  insuranceName         String?
+  insuranceNumber       String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
 
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Customer{
-	id            String	@id @default(uuid())
-	name          String?
-	email         String
-	cpf           String?  	@unique
-	image         String?
-	address        String? @default("")
-	phone         String? @default("")
-	status        Boolean @default(true)
-	treatmentStatus CustomerStatus @default(AGUARDANDO)
+model Customer {
+  id              String         @id @default(uuid())
+  name            String?
+  email           String
+  cpf             String?
+  image           String?
+  address         String?        @default("")
+  phone           String?        @default("")
+  status          Boolean        @default(true)
+  treatmentStatus CustomerStatus @default(AGUARDANDO)
 
-	userId String
-	user User @relation(fields:[userId], references:[id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
-	appointments Appointments[]
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
+  appointments Appointments[]
 
-	@@unique([userId, email])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, email])
+  @@unique([organizationId, cpf])
 }
 
 enum AppointmentStatus {
-	CONFIRMED
-	IN_PROGRESS
-	COMPLETED
-	NO_SHOW
-	CANCELLED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  NO_SHOW
+  CANCELLED
 }
 
 enum CustomerStatus {
-	AGUARDANDO
-	EM_TRATAMENTO
-	ALTA
-}
-model Reminder{
-	id String @id @default(uuid())
-	description String
-
-	userId String
-	user User @relation(fields:[userId], references:[id])
+  AGUARDANDO
+  EM_TRATAMENTO
+  ALTA
 }
 
-model Service{
-	id  			String @id @default(uuid())
-	name 			String
-	price 			Int
-	duration 		Int
-	status        	Boolean @default(true)	 
-	createdAt 		DateTime @default(now())
-	updatedAt 		DateTime @updatedAt
+model Reminder {
+  id          String @id @default(uuid())
+  description String
 
-
-	userId 			String
-	user User @relation(fields:[userId], references:[id])
-
-	appointments Appointments[]
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
-enum Plan{
-	BASIC
-	PROFESSIONAL
+model Service {
+  id        String   @id @default(uuid())
+  name      String
+  price     Int
+  duration  Int
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  appointments Appointments[]
 }
 
-enum Segment{
-	BARBEARIA
-	SALAO_BELEZA
-	CLINICA_ESTETICA
-	FISIOTERAPIA
-	ODONTOLOGIA
-	MEDICO
+enum Plan {
+  BASIC
+  PROFESSIONAL
 }
 
-model Subscription{
-	id  			String @id @default(uuid())
-	status 			String
-	plan 			Plan
-	priceId 		String
+enum Segment {
+  BARBEARIA
+  SALAO_BELEZA
+  CLINICA_ESTETICA
+  FISIOTERAPIA
+  ODONTOLOGIA
+  MEDICO
+}
 
-	createdAt		DateTime @default(now())
-	updatedAt 		DateTime @updatedAt
+model Subscription {
+  id      String @id @default(uuid())
+  status  String
+  plan    Plan
+  priceId String
 
-	userId String @unique
-	user User @relation(fields:[userId], references:[id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+enum MembershipRole {
+  OWNER
+  STAFF
+}
+
+model Membership {
+  id   String         @id @default(cuid())
+  role MembershipRole @default(OWNER)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, organizationId])
+}
+
+model Organization {
+  id                       String    @id @default(cuid())
+  name                     String?
+  image                    String?
+  address                  String?   @default("")
+  phone                    String?   @default("")
+  status                   Boolean   @default(true)
+  segment                  Segment?
+  professionalRegistration String?
+  timezone                 String?
+  times                    String[]  @default([])
+  stripe_customer_id       String?
+
+  memberships  Membership[]
+  subscription Subscription?
+  services     Service[]
+  reminders    Reminder[]
+  customers    Customer[]
+  appointments Appointments[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
-	id            String          @id @default(cuid())
-	name          String?
-	email         String          @unique
-	emailVerified DateTime?
-	image         String?
-	address        String? @default("")
-	phone         String? @default("")
-	status        Boolean @default(true)
-	segment       Segment?
-	professionalRegistration String?
-	timezone      String?
-	times		  String[] @default([])
-	stripe_customer_id String?
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?
 
-	subscription 	Subscription?
-	services 		Service[]
-	reminder 		Reminder[]
-	customer 		Customer[]
-	appointments 	Appointments[]
-	accounts      	Account[]
-	sessions      	Session[]
-	// Optional for WebAuthn support
-	Authenticator Authenticator[]
- 
-	createdAt DateTime @default(now())
+  memberships    Membership[]
+  patientProfile PatientProfile?
+  customers      Customer[]
+  accounts       Account[]
+  sessions       Session[]
+  Authenticator  Authenticator[]
 
-	updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
- 
+
 model Account {
-	userId            String
-	type              String
-	provider          String
-	providerAccountId String
-	refresh_token     String?
-	access_token      String?
-	expires_at        Int?
-	token_type        String?
-	scope             String?
-	id_token          String?
-	session_state     String?
- 
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
- 
-	user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-	@@id([provider, providerAccountId])
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
 }
- 
+
 model Session {
-	sessionToken String   @unique
-	userId       String
-	expires      DateTime
-	user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
- 
+
 model VerificationToken {
-	identifier String
-	token      String
-	expires    DateTime
- 
-	@@id([identifier, token])
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }
- 
-// Optional for WebAuthn support
+
 model Authenticator {
-	credentialID         String  @unique
-	userId               String
-	providerAccountId    String
-	credentialPublicKey  String
-	counter              Int
-	credentialDeviceType String
-	credentialBackedUp   Boolean
-	transports           String?
- 
-	user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-	@@id([userId, credentialID])
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
 }

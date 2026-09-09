@@ -43,7 +43,7 @@ export function RescheduleSheet({
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const clinicTimes = appointment.user.times ?? [];
+  const clinicTimes = appointment.organization.times ?? [];
   const requiredSlots = Math.ceil(appointment.service.duration / 30);
 
   useEffect(() => {
@@ -58,14 +58,14 @@ export function RescheduleSheet({
     setLoadingSlots(true);
     setSelectedTime("");
     fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?userId=${appointment.user.id}&date=${dateParam(date)}&excludeAppointmentId=${appointment.id}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/schedule/get-appointments?userId=${appointment.organization.id}&date=${dateParam(date)}&excludeAppointmentId=${appointment.id}`,
     )
       .then((res) => res.json())
       .then((blocked) => setBlockedTimes(Array.isArray(blocked) ? blocked : []))
       .catch(() => setBlockedTimes([]))
       .finally(() => setLoadingSlots(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, date, appointment.id, appointment.user.id]);
+  }, [open, date, appointment.id, appointment.organization.id]);
 
   const availableTimes: TimeSlot[] = clinicTimes.map((time) => ({
     time,
@@ -98,7 +98,7 @@ export function RescheduleSheet({
         <DialogHeader>
           <DialogTitle>Remarcar {appointment.service.name}</DialogTitle>
           <DialogDescription>
-            Escolha o novo dia e horário na {appointment.user.name}.
+            Escolha o novo dia e horário na {appointment.organization.name}.
           </DialogDescription>
         </DialogHeader>
 
