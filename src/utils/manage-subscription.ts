@@ -3,7 +3,7 @@ import { stripe } from "@/utils/stripe";
 import Stripe from "stripe";
 import { Plan } from "@prisma/client";
 /**
- * Salvar atualizar ou deletar informações de assinatura do usuário no banco de dados.
+ * Salvar atualizar ou deletar informações de assinatura da organização no banco de dados.
  */
 export async function manageSubscription(
   subscriptionId: string,
@@ -12,14 +12,14 @@ export async function manageSubscription(
   deleteAction = false,
   type?: Plan,
 ) {
-  const findUser = await prisma.user.findFirst({
+  const findOrganization = await prisma.organization.findFirst({
     where: {
       stripe_customer_id: customerId,
     },
   });
 
-  if (!findUser) {
-    return Response.json({ error: "Usuário não encontrado." }, { status: 404 });
+  if (!findOrganization) {
+    return Response.json({ error: "Organização não encontrada." }, { status: 404 });
   }
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -29,7 +29,7 @@ export async function manageSubscription(
     status: subscription.status,
     Plan: type ?? "BASIC",
     priceId: subscription.items.data[0].price.id,
-    userId: findUser.id,
+    organizationId: findOrganization.id,
   };
 
   // Se a ação for deletar uma assinatura, remova os dados do banco de dados
@@ -52,7 +52,7 @@ export async function manageSubscription(
           status: subscriptionData.status,
           plan: subscriptionData.Plan,
           priceId: subscriptionData.priceId,
-          userId: subscriptionData.userId,
+          organizationId: subscriptionData.organizationId,
         },
       });
     } catch (error) {

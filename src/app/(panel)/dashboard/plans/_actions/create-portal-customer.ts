@@ -1,38 +1,25 @@
 "use server";
 import { auth } from "@/lib/auth";
 import { stripe } from "@/utils/stripe";
-import Prisma from "@/lib/prisma";
-import { Plan } from "@prisma/client";
+import { requireActiveOrganization } from "@/lib/organization";
 
 export async function createPortalCustomer() {
   const session = await auth();
-  const userId = session?.user?.id;
 
-  if (!userId) {
+  if (!session?.user?.id) {
     return {
       sessionId: "",
       error: "Usuário não autenticado",
     };
   }
 
-  const user = await Prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!user) {
-    return {
-      sessionId: "",
-      error: "Usuário não encontrado",
-    };
-  }
-  const customerId = user.stripe_customer_id;
+  const organization = await requireActiveOrganization();
+  const customerId = organization.stripe_customer_id;
 
   if (!customerId) {
     return {
       sessionId: "",
-      error: "Usuário não possui um ID de cliente Stripe",
+      error: "Organização não possui um ID de cliente Stripe",
     };
   }
 
