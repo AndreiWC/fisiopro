@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import getSession from "@/lib/getSession";
 import { getCurrentPatient } from "../_actions/patient-auth";
-import { LoginChooser } from "./_components/login-chooser";
+import { LoginChooser } from "../_components/login-chooser";
 
 export default async function LoginPage() {
   const clinicSession = await getSession();
