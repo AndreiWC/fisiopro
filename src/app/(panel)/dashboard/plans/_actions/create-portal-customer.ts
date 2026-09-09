@@ -1,7 +1,7 @@
 "use server";
 import { auth } from "@/lib/auth";
 import { stripe } from "@/utils/stripe";
-import { requireActiveOrganization } from "@/lib/organization";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function createPortalCustomer() {
   const session = await auth();
@@ -13,7 +13,10 @@ export async function createPortalCustomer() {
     };
   }
 
-  const organization = await requireActiveOrganization();
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { sessionId: "", error: "Nenhuma organização vinculada à sua conta" };
+  }
   const customerId = organization.stripe_customer_id;
 
   if (!customerId) {

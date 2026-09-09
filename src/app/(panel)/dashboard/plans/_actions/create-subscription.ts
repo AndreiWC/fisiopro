@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { stripe } from "@/utils/stripe";
 import Prisma from "@/lib/prisma";
 import { Plan } from "@prisma/client";
-import { requireActiveOrganization } from "@/lib/organization";
+import { getActiveOrganization } from "@/lib/organization";
 
 interface CreateSubscriptionProps {
   type: Plan;
@@ -18,7 +18,10 @@ export async function createSubscription({ type }: CreateSubscriptionProps) {
     };
   }
 
-  const organization = await requireActiveOrganization();
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { sessionId: "", error: "Nenhuma organização vinculada à sua conta" };
+  }
 
   let customerId = organization.stripe_customer_id ?? undefined;
 

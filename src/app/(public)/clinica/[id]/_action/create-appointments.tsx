@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
@@ -23,6 +24,8 @@ export async function createNewAppointment(formData: FormSchema) {
     };
   }
 
+  const session = await auth();
+
   try {
     const selectedDate = new Date(formData.date);
     const year = selectedDate.getFullYear();
@@ -30,6 +33,20 @@ export async function createNewAppointment(formData: FormSchema) {
     const day = selectedDate.getDate();
 
     const appointmentDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0)); // Cria a data no formato UTC
+
+    const service = await prisma.service.findFirst({
+      where: {
+        id: formData.serviceId,
+        organizationId: formData.organizationId,
+        status: true,
+      },
+    });
+
+    if (!service) {
+      return {
+        error: "Serviço não encontrado para esta clínica",
+      };
+    }
 
     const customer = await prisma.customer.upsert({
       where: {
@@ -40,10 +57,12 @@ export async function createNewAppointment(formData: FormSchema) {
         email: formData.email,
         phone: formData.phone,
         organizationId: formData.organizationId,
+        userId: session?.user?.id,
       },
       update: {
         name: formData.name,
         phone: formData.phone,
+        userId: session?.user?.id,
       },
     });
 
