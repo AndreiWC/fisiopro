@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { ca } from "zod/v4/locales";
+import { getActiveOrganization } from "@/lib/organization";
 
 const formShema = z.object({
   serviceId: z.string().min(1, { message: "ID do serviço é obrigatório" }),
@@ -20,11 +20,17 @@ export async function deleteServiceAction(formData: formShema) {
   if (!schema.success) {
     return { error: schema.error.issues[0].message };
   }
+
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
+  }
+
   try {
     await prisma.service.update({
       where: {
         id: formData.serviceId,
-        userId: session?.user?.id,
+        organizationId: organization.id,
       },
       data: {
         status: false,

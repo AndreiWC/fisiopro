@@ -4,18 +4,15 @@ import { ServicesList } from "./services-list";
 import { canPermissions } from "@/utils/permissions/canPermissions";
 
 interface ServicesContentProps {
-  userId: string;
+  organizationId: string;
 }
 
-export async function ServicesContent({ userId }: ServicesContentProps) {
-  const services = await getAllServices({ userId: userId });
+export async function ServicesContent({ organizationId }: ServicesContentProps) {
+  const services = await getAllServices({ organizationId });
   const permissions = await canPermissions({ type: "service" });
- 
 
   return (
     <>
-     
-
       {!permissions.hasPermission && (
         <LabelSubscription expired={permissions.expired} />
       )}

@@ -2,12 +2,16 @@ import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { ServicesContent } from "./_components/services-content";
 import { Suspense } from "react";
+import { requireActiveOrganization } from "@/lib/organization";
+
 export default async function Services() {
   //valida se a sessão esta logada
   const session = await getSession();
   if (!session) {
     redirect("/");
   }
+
+  const organization = await requireActiveOrganization();
 
   return (
     <main>
@@ -22,7 +26,7 @@ export default async function Services() {
 
       <div className="mt-4">
         <Suspense fallback={<p className="text-sm text-muted-foreground">Carregando serviços...</p>}>
-          <ServicesContent userId={session.user.id} />
+          <ServicesContent organizationId={organization.id} />
         </Suspense>
       </div>
     </main>
