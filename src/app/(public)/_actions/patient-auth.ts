@@ -7,6 +7,7 @@ export type CurrentPatient = {
   id: string;
   name: string | null;
   email: string;
+  image: string | null;
   phone: string | null;
   cpf: string | null;
   insuranceName: string | null;
@@ -30,6 +31,7 @@ export async function getCurrentPatient(): Promise<CurrentPatient | null> {
     id: user.id,
     name: user.name,
     email: user.email,
+    image: user.image,
     phone: user.phone,
     cpf: patientProfile.cpf,
     insuranceName: patientProfile.insuranceName,
