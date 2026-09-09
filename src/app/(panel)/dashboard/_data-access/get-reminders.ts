@@ -2,14 +2,14 @@
 
 import prisma from "@/lib/prisma";
 
-export async function getReminders({ userId }: { userId: string }) {
-  if (!userId) {
+export async function getReminders({ organizationId }: { organizationId: string }) {
+  if (!organizationId) {
     return [];
   }
 
   try {
     const reminders = await prisma.reminder.findMany({
-      where: { userId },
+      where: { organizationId },
     });
     return reminders;
   } catch (err) {

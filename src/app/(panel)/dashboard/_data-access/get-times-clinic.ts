@@ -1,18 +1,18 @@
 "use server";
 import prisma from "@/lib/prisma";
 
-export async function getTimesClinic({ userId }: { userId: string }) {
+export async function getTimesClinic({ organizationId }: { organizationId: string }) {
   try {
-    if (!userId) {
+    if (!organizationId) {
       return {
         times: [],
-        userId: userId,
+        organizationId: organizationId,
       };
     }
 
-    const user = await prisma.user.findFirst({
+    const organization = await prisma.organization.findFirst({
       where: {
-        id: userId,
+        id: organizationId,
       },
       select: {
         id: true,
@@ -20,18 +20,18 @@ export async function getTimesClinic({ userId }: { userId: string }) {
       },
     });
 
-    if (!user) {
+    if (!organization) {
       return {
         times: [],
-        userId: "",
+        organizationId: "",
       };
     }
 
-    return { times: user.times, userId: user.id };
+    return { times: organization.times, organizationId: organization.id };
   } catch (err) {
     return {
       times: [],
-      userId: "",
+      organizationId: "",
       error: "Erro ao buscar horários: " + (err as any).message,
     };
   }

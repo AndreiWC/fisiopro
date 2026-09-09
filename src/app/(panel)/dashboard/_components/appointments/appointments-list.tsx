@@ -29,17 +29,18 @@ import { DayStrip } from "./day-strip";
 export type AppointmentWithService = Prisma.AppointmentsGetPayload<{
   include: {
     service: true;
+    customer: true;
   };
 }>;
 
 interface AppointmentsListProps {
   times: string[];
-  userId: string;
+  organizationId: string;
 }
 
 export const STATUS_META = APPOINTMENT_STATUS_META;
 
-export function AppointmentsList({ times, userId }: AppointmentsListProps) {
+export function AppointmentsList({ times, organizationId }: AppointmentsListProps) {
   const searchParams = useSearchParams();
   const date = searchParams.get("date");
   const queryClient = useQueryClient();
@@ -166,7 +167,7 @@ export function AppointmentsList({ times, userId }: AppointmentsListProps) {
                         {slot}
                       </div>
                       <div className="min-w-0 flex-1 text-sm">
-                        <div className="truncate font-semibold">{occupant.name}</div>
+                        <div className="truncate font-semibold">{occupant.customer.name}</div>
                         <div className="truncate text-sm text-muted-foreground">
                           {occupant.service.name}
                         </div>
@@ -209,7 +210,7 @@ export function AppointmentsList({ times, userId }: AppointmentsListProps) {
                 return (
                   <Link
                     key={slot}
-                    href={`/clinica/${userId}`}
+                    href={`/clinica/${organizationId}`}
                     target="_blank"
                     className="group flex items-center gap-3 border-t py-3 last:border-b"
                   >

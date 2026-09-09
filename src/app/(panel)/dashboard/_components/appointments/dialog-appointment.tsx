@@ -48,16 +48,16 @@ export function DialogAppointment({ appointment }: DialogAppointmentProps) {
             </p>
             <p>
               <span className="font-semibold">Nome:</span>
-              {appointment.name}
+              {appointment.customer.name}
             </p>
 
             <p>
               <span className="font-semibold">Telefone:</span>
-              {appointment.phone}
+              {appointment.customer.phone}
             </p>
             <p>
               <span className="font-semibold">E-mail:</span>
-              {appointment.email}
+              {appointment.customer.email}
             </p>
 
             <section className="bg-muted mt-4 p-2 rounded-md">
