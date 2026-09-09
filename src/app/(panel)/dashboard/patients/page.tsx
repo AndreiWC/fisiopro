@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import getSession from "@/lib/getSession";
 import { getPatients } from "./_data-access/get-patients";
 import { PatientsList } from "./_components/patients-list";
+import { requireActiveOrganization } from "@/lib/organization";
 
 export default async function PatientsPage() {
   const session = await getSession();
@@ -9,7 +10,8 @@ export default async function PatientsPage() {
     redirect("/");
   }
 
-  const patients = await getPatients({ userId: session.user.id! });
+  const organization = await requireActiveOrganization();
+  const patients = await getPatients({ organizationId: organization.id });
 
   return (
     <main>

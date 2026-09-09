@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { CustomerStatus } from "@prisma/client";
+import { getActiveOrganization } from "@/lib/organization";
 
 const formSchema = z.object({
   customerId: z.string().min(1, "O ID do paciente é obrigatório"),
@@ -24,11 +25,16 @@ export async function updatePatientStatus(formData: FormSchema) {
     return { error: "Usuário não autenticado" };
   }
 
+  const organization = await getActiveOrganization();
+  if (!organization) {
+    return { error: "Nenhuma organização vinculada à sua conta" };
+  }
+
   try {
     await prisma.customer.update({
       where: {
         id: formData.customerId,
-        userId: session.user.id,
+        organizationId: organization.id,
       },
       data: {
         treatmentStatus: formData.treatmentStatus,
