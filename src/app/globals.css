@@ -46,76 +46,78 @@
 }
 
 :root {
-  /* Encaixa — sistema de design: azul petróleo clínico (confiança, saúde)
-     sobre neutros frios e claros, com terracota reservado a detalhes raros. */
+  /* Encaixa — sistema de design: verde vivo e natural. Verde é a cor de ação
+     (saúde, cuidado, crescimento — não hospital), grafite dá peso estrutural
+     sem recorrer a cinza-azulado frio, coral é o contraponto quente reservado
+     a destaques (selo, status, ícone da marca). Base neutra, nunca creme. */
   --radius: 0.75rem;
-  --background: #f7fafb;
-  --foreground: #142b30;
+  --background: #f6faf7;
+  --foreground: #14201a;
   --card: #ffffff;
-  --card-foreground: #142b30;
+  --card-foreground: #14201a;
   --popover: #ffffff;
-  --popover-foreground: #142b30;
-  --primary: #0f5c6b;
-  --primary-foreground: #ffffff;
-  --secondary: #e7eef0;
-  --secondary-foreground: #142b30;
-  --muted: #e7eef0;
-  --muted-foreground: #5c7a7f;
-  --accent: #dff3ef;
-  --accent-foreground: #0b4a46;
-  --accent-warm: #e8794a;
+  --popover-foreground: #14201a;
+  --primary: #0d9457;
+  --primary-foreground: #f4fbf6;
+  --secondary: #e7efe9;
+  --secondary-foreground: #1b2a22;
+  --muted: #eef2ed;
+  --muted-foreground: #5b6b60;
+  --accent: #fde7de;
+  --accent-foreground: #7a2e12;
+  --accent-warm: #f2653c;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #dce6e8;
-  --input: #dce6e8;
-  --ring: #2fa6a0;
-  --chart-1: #0f5c6b;
-  --chart-2: #e8794a;
-  --chart-3: #2fa6a0;
-  --chart-4: #c9a227;
-  --chart-5: #6b8a8f;
+  --border: #dce6df;
+  --input: #dce6df;
+  --ring: #12a863;
+  --chart-1: #0d9457;
+  --chart-2: #f2653c;
+  --chart-3: #2b2b28;
+  --chart-4: #c9962e;
+  --chart-5: #6b8a7a;
   --sidebar: #ffffff;
-  --sidebar-foreground: #142b30;
-  --sidebar-primary: #0f5c6b;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e7eef0;
-  --sidebar-accent-foreground: #142b30;
-  --sidebar-border: #dce6e8;
-  --sidebar-ring: #2fa6a0;
+  --sidebar-foreground: #14201a;
+  --sidebar-primary: #0d9457;
+  --sidebar-primary-foreground: #f4fbf6;
+  --sidebar-accent: #e7efe9;
+  --sidebar-accent-foreground: #1b2a22;
+  --sidebar-border: #dce6df;
+  --sidebar-ring: #12a863;
 }
 
 .dark {
-  --background: #0b1b1e;
-  --foreground: #e7f2f2;
-  --card: #102428;
-  --card-foreground: #e7f2f2;
-  --popover: #102428;
-  --popover-foreground: #e7f2f2;
-  --primary: #2fa6a0;
-  --primary-foreground: #04181a;
-  --secondary: #172c30;
-  --secondary-foreground: #e7f2f2;
-  --muted: #172c30;
-  --muted-foreground: #8fb0b3;
-  --accent: #24211b;
-  --accent-foreground: #f0a67d;
-  --accent-warm: #e8794a;
+  --background: #0f1912;
+  --foreground: #edf3ee;
+  --card: #16211a;
+  --card-foreground: #edf3ee;
+  --popover: #16211a;
+  --popover-foreground: #edf3ee;
+  --primary: #22c55e;
+  --primary-foreground: #0b1710;
+  --secondary: #1e2b22;
+  --secondary-foreground: #edf3ee;
+  --muted: #1e2b22;
+  --muted-foreground: #9ab0a0;
+  --accent: #2e1a12;
+  --accent-foreground: #ffa98a;
+  --accent-warm: #ff7a45;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: #2fa6a0;
-  --chart-1: #2fa6a0;
-  --chart-2: #e8794a;
-  --chart-3: #7ca9c4;
-  --chart-4: #d9bb4a;
-  --chart-5: #6b8a8f;
-  --sidebar: #0a1618;
-  --sidebar-foreground: #e7f2f2;
-  --sidebar-primary: #2fa6a0;
-  --sidebar-primary-foreground: #04181a;
-  --sidebar-accent: #172c30;
-  --sidebar-accent-foreground: #e7f2f2;
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #2fa6a0;
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: #34d671;
+  --chart-1: #22c55e;
+  --chart-2: #ff7a45;
+  --chart-3: #c9d6cc;
+  --chart-4: #e0b04d;
+  --chart-5: #6e8a78;
+  --sidebar: #16211a;
+  --sidebar-foreground: #edf3ee;
+  --sidebar-primary: #22c55e;
+  --sidebar-primary-foreground: #0b1710;
+  --sidebar-accent: #1e2b22;
+  --sidebar-accent-foreground: #edf3ee;
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: #34d671;
 }
 
 @layer base {

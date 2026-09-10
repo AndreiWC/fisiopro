@@ -24,8 +24,8 @@ export function Logo({
         aria-hidden="true"
         className={cn("h-7 w-7 shrink-0", iconClassName)}
       >
-        <rect x="2" y="6" width="20" height="20" rx="7" fill="#0F5C6B" />
-        <rect x="17" y="11" width="13" height="13" rx="4" fill="#E8794A" />
+        <rect x="2" y="6" width="20" height="20" rx="7" className="fill-primary" />
+        <rect x="17" y="11" width="13" height="13" rx="4" className="fill-accent-warm" />
       </svg>
       {showWordmark && (
         <span
