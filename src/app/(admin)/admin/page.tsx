@@ -1,4 +1,9 @@
-export default function AdminHomePage() {
+import { getDashboardMetrics } from "./_data-access/get-dashboard-metrics";
+import { AdminKpiCards } from "./_components/admin-kpi-cards";
+
+export default async function AdminHomePage() {
+  const metrics = await getDashboardMetrics();
+
   return (
     <main className="space-y-6">
       <div>
@@ -9,6 +14,8 @@ export default function AdminHomePage() {
           Visão geral das empresas e assinaturas do FisioPro.
         </p>
       </div>
+
+      <AdminKpiCards metrics={metrics} />
     </main>
   );
 }
