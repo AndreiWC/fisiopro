@@ -16,6 +16,7 @@ import {
   Settings,
   UserCircle,
   Users,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Agendamentos", icon: CalendarCheck2 },
   { href: "/dashboard/patients", label: "Pacientes", icon: Users },
   { href: "/dashboard/services", label: "Serviços", icon: Folder },
+  { href: "/dashboard/financeiro", label: "Financeiro", icon: Wallet },
 ] as const;
 
 const SETTINGS_ITEMS = [
@@ -34,6 +36,7 @@ const SETTINGS_ITEMS = [
 const BOTTOM_TAB_ITEMS = [
   { href: "/dashboard", label: "Agenda", icon: CalendarCheck2 },
   { href: "/dashboard/patients", label: "Pacientes", icon: Users },
+  { href: "/dashboard/financeiro", label: "Financeiro", icon: Wallet },
   { href: "/dashboard/services", label: "Serviços", icon: Folder },
   { href: "/dashboard/profile", label: "Perfil", icon: Settings },
 ] as const;
