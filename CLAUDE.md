@@ -27,13 +27,14 @@ There is no test suite/runner configured in this project.
 
 ## Environment
 
-Config is read from `fisiopro/.env` (not committed). Required vars: `DATABASE_URL` (Postgres), `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `CLOUDINARY_NAME`/`CLOUDINARY_KEY`/`CLOUDINARY_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_SECRET_WEBHOOK_KEY`, `NEXT_PUBLIC_STRIPE_PUBLIC_KEY`, `STRIPE_BASIC_PLAN_ID`, `STRIPE_PREMIUM_PLAN_ID`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, `NEXT_PUBLIC_BASE_URL`. Optional: `RESEND_API_KEY` (and `RESEND_FROM_EMAIL`) — powers the e-mail verification code on the public `/agendamentos` page (`src/app/(public)/agendamentos`); without it, that page's "enviar código" step returns a clear error instead of sending anything.
+Config is read from `fisiopro/.env` (not committed). Required vars: `DATABASE_URL` (Postgres), `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `CLOUDINARY_NAME`/`CLOUDINARY_KEY`/`CLOUDINARY_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_SECRET_WEBHOOK_KEY`, `NEXT_PUBLIC_STRIPE_PUBLIC_KEY`, `STRIPE_BASIC_PLAN_ID`, `STRIPE_PREMIUM_PLAN_ID`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, `NEXT_PUBLIC_BASE_URL`. Optional: `RESEND_API_KEY` (and `RESEND_FROM_EMAIL`) — powers the e-mail verification code on the public `/agendamentos` page (`src/app/(public)/agendamentos`); without it, that page's "enviar código" step returns a clear error instead of sending anything. `ADMIN_EMAILS` (comma-separated list of e-mails allowed into `/admin`) — controls access to the super-admin area; if not set or empty, no one can access `/admin`.
 
 ## Architecture
 
-**Route groups.** `src/app` splits into two route groups plus `api`:
+**Route groups.** `src/app` splits into three route groups plus `api`:
 - `(panel)/dashboard` — authenticated clinic-owner area (services, customers/reports, profile, plans/billing).
 - `(public)` — marketing home page and `clinica/[id]` public booking flow (no login required; `[id]` is a user id).
+- `(admin)/admin` — super-admin-only area (companies, subscriptions, analytics). Access is a static e-mail whitelist (`ADMIN_EMAILS` env var), checked by `requireAdminSession()`/`isAdminEmail()` in `src/lib/require-admin.ts` — not a role stored in the database.
 - `api` — NextAuth handler, Stripe webhook, image upload (Cloudinary), and a couple of JSON endpoints used by the public booking page (`schedule/get-appointments`, `clinic/appointments`).
 
 There is no `middleware.ts`; route protection happens per-request by calling `auth()` inside server actions/pages, not via edge middleware.
