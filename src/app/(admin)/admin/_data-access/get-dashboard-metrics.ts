@@ -3,12 +3,15 @@
 import prisma from "@/lib/prisma";
 import { subscriptionPlans } from "@/utils/plans";
 import type { Plan } from "@prisma/client";
+import { requireAdminSession } from "@/lib/require-admin";
 
 function priceForPlan(plan: Plan): number {
   return subscriptionPlans.find((p) => p.id === plan)?.price ?? 0;
 }
 
 export async function getDashboardMetrics() {
+  await requireAdminSession();
+
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 

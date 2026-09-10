@@ -174,7 +174,7 @@ export function EmpresasList({ organizations }: EmpresasListProps) {
                         org.status ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive",
                       )}
                     >
-                      {org.status ? "Ativa" : "Suspensa"}
+                      {org.status ? "Empresa ativa" : "Empresa suspensa"}
                     </span>
                   </div>
                 </Link>

@@ -1,8 +1,11 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/require-admin";
 
 export async function getOrganizations() {
+  await requireAdminSession();
+
   const organizations = await prisma.organization.findMany({
     include: { subscription: true },
     orderBy: { createdAt: "desc" },

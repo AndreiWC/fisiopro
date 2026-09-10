@@ -33,6 +33,7 @@ export async function toggleOrganizationStatus(formData: FormSchema) {
     revalidatePath(`/admin/empresas/${schema.data.organizationId}`);
     return { data: "Status da empresa atualizado com sucesso" };
   } catch (error) {
+    console.error("Erro ao atualizar status da organização:", error);
     return { error: "Erro ao atualizar status da empresa" };
   }
 }

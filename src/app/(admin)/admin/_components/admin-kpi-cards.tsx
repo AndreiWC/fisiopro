@@ -19,7 +19,7 @@ export function AdminKpiCards({ metrics }: AdminKpiCardsProps) {
   const cards = [
     { title: "MRR", value: currencyFormatter.format(metrics.mrr) },
     {
-      title: "Empresas ativas / total",
+      title: "Assinaturas ativas / empresas",
       value: `${metrics.activeSubscriptionsCount} / ${metrics.totalOrganizations}`,
     },
     { title: "Novas este mês", value: String(metrics.newOrganizationsThisMonth) },

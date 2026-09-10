@@ -2,8 +2,11 @@
 
 import prisma from "@/lib/prisma";
 import { PLANS } from "@/utils/plans";
+import { requireAdminSession } from "@/lib/require-admin";
 
 export async function getOrganizationDetail(organizationId: string) {
+  await requireAdminSession();
+
   const organization = await prisma.organization.findUnique({
     where: { id: organizationId },
     include: {
