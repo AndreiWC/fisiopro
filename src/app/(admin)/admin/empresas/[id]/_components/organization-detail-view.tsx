@@ -64,7 +64,7 @@ export function OrganizationDetailView({ organization }: OrganizationDetailViewP
           disabled={isPending}
           onClick={handleToggleStatus}
         >
-          {status ? "Suspender empresa" : "Reativar empresa"}
+          {status ? "Ocultar da vitrine pública" : "Reexibir na vitrine pública"}
         </Button>
       </div>
 
@@ -75,14 +75,14 @@ export function OrganizationDetailView({ organization }: OrganizationDetailViewP
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p>
-              <span className="text-muted-foreground">Status: </span>
+              <span className="text-muted-foreground">Vitrine pública: </span>
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-xs font-medium",
                   status ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive",
                 )}
               >
-                {status ? "Ativa" : "Suspensa"}
+                {status ? "Visível" : "Oculta"}
               </span>
             </p>
             <p>

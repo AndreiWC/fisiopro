@@ -110,7 +110,7 @@ export function EmpresasList({ organizations }: EmpresasListProps) {
 
         <div className="flex gap-2">
           {(["TODAS", "ATIVAS", "SUSPENSAS"] as const).map((value) => {
-            const label = value === "TODAS" ? "Todas" : value === "ATIVAS" ? "Ativas" : "Suspensas";
+            const label = value === "TODAS" ? "Todas" : value === "ATIVAS" ? "Visíveis" : "Ocultas";
             const isActive = companyStatusFilter === value;
             return (
               <button
@@ -174,7 +174,7 @@ export function EmpresasList({ organizations }: EmpresasListProps) {
                         org.status ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive",
                       )}
                     >
-                      {org.status ? "Empresa ativa" : "Empresa suspensa"}
+                      {org.status ? "Visível no site" : "Oculta do site"}
                     </span>
                   </div>
                 </Link>
