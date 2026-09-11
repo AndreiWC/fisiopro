@@ -73,7 +73,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
       >
         <div className="mb-6 mt-4 flex items-center justify-between">
           {!isCollapsed && (
-            <Link href="/">
+            <Link href="/dashboard">
               <Logo />
             </Link>
           )}
@@ -143,7 +143,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
         })}
       >
         <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-border bg-background px-4 md:hidden">
-          <Link href="/">
+          <Link href="/dashboard">
             <Logo iconClassName="h-6 w-6" wordmarkClassName="text-base" />
           </Link>
           <Link

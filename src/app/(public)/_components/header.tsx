@@ -88,7 +88,7 @@ export function Header() {
   return (
     <header className="fixed to-0% right-0 left-0 z-[999] py-4 px-6 bg-background/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto flex items-center justify-between">
-        <Link href="/">
+        <Link href={identity?.role === "clinic" ? "/dashboard" : "/"}>
           <Logo />
         </Link>
         <nav className="hidden md:flex items-center space-x-4">
