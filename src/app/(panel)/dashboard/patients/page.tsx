@@ -25,7 +25,7 @@ export default async function PatientsPage() {
       </div>
 
       <div className="mt-4">
-        <PatientsList patients={patients} />
+        <PatientsList patients={patients} organizationId={organization.id} />
       </div>
     </main>
   );

@@ -64,7 +64,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen w-full">
       <aside
         className={clsx(
-          "hidden md:flex md:fixed h-full flex-col border-r border-border bg-background p-4 transition-all duration-300",
+          "hidden md:flex md:fixed h-full flex-col bg-sidebar p-4 transition-all duration-300",
           {
             "w-20": isCollapsed,
             "w-64": !isCollapsed,
@@ -74,13 +74,16 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
         <div className="mb-6 mt-4 flex items-center justify-between">
           {!isCollapsed && (
             <Link href="/dashboard">
-              <Logo />
+              <Logo tone="onDark" />
             </Link>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className={clsx("shrink-0 text-muted-foreground", isCollapsed && "mx-auto")}
+            className={clsx(
+              "shrink-0 text-sidebar-foreground/70 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground",
+              isCollapsed && "mx-auto",
+            )}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {!isCollapsed ? (
@@ -93,7 +96,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
 
         <nav className="flex flex-1 flex-col gap-1 overflow-hidden">
           {!isCollapsed && (
-            <span className="mt-1 px-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            <span className="mt-1 px-3 text-xs font-semibold tracking-wide text-sidebar-foreground/50 uppercase">
               Painel
             </span>
           )}
@@ -102,30 +105,30 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
           ))}
 
           {!isCollapsed && (
-            <span className="mt-4 px-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            <span className="mt-4 px-3 text-xs font-semibold tracking-wide text-sidebar-foreground/50 uppercase">
               Configurações
             </span>
           )}
-          {isCollapsed && <div className="my-2 border-t border-border" />}
+          {isCollapsed && <div className="my-2 border-t border-sidebar-foreground/15" />}
           {SETTINGS_ITEMS.map((item) => (
             <SidebarLink key={item.href} {...item} pathname={pathname} isCollapsed={isCollapsed} />
           ))}
         </nav>
 
-        <div className="mt-2 border-t border-border pt-3">
+        <div className="mt-2 border-t border-sidebar-foreground/15 pt-3">
           <div className={clsx("flex items-center gap-2.5", isCollapsed && "justify-center")}>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-sm font-semibold text-primary">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sidebar-foreground/15 text-sm font-semibold text-sidebar-foreground">
               {session?.user?.name ? initials(session.user.name) : "?"}
             </span>
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">
+                <p className="truncate text-sm font-medium text-sidebar-foreground">
                   {session?.user?.name ?? "Minha conta"}
                 </p>
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+                  className="flex items-center gap-1 text-xs text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
                 >
                   <LogOut className="h-3 w-3" />
                   Sair
@@ -142,14 +145,14 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
           "md:ml-64": !isCollapsed,
         })}
       >
-        <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-border bg-background px-4 md:hidden">
+        <header className="sticky top-0 z-10 flex h-14 items-center justify-between bg-sidebar px-4 md:hidden">
           <Link href="/dashboard">
-            <Logo iconClassName="h-6 w-6" wordmarkClassName="text-base" />
+            <Logo tone="onDark" iconClassName="h-6 w-6" wordmarkClassName="text-base" />
           </Link>
           <Link
             href="/dashboard/profile"
             aria-label="Meu perfil"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground"
           >
             <UserCircle className="h-5 w-5" />
           </Link>
@@ -160,7 +163,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
 
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         <div className="flex items-stretch">
           {BOTTOM_TAB_ITEMS.map(({ href, label, icon: Icon }) => {
@@ -171,7 +174,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={clsx(
                   "flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors",
-                  isActive ? "text-primary" : "text-muted-foreground",
+                  isActive ? "text-sidebar-foreground" : "text-sidebar-foreground/55",
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -203,8 +206,8 @@ function SidebarLink({ href, icon: Icon, isCollapsed, label, pathname }: Sidebar
         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         isCollapsed && "justify-center",
         isActive
-          ? "bg-primary/10 font-medium text-primary"
-          : "text-foreground/70 hover:bg-secondary hover:text-foreground",
+          ? "bg-sidebar-foreground/15 font-medium text-sidebar-foreground"
+          : "text-sidebar-foreground/70 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground",
       )}
     >
       <Icon className="h-5 w-5 shrink-0" />

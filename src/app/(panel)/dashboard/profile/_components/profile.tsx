@@ -1,4 +1,5 @@
 "use client";
+import type { ComponentType } from "react";
 import { ProfileFormData, useProfileForm } from "./profile-form";
 import {
   Form,
@@ -24,9 +25,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock, CreditCard, LogOut, MapPin } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  LogOut,
+  MapPin,
+  User,
+} from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
@@ -84,10 +101,13 @@ function initials(name: string | null) {
   return (first + last).toUpperCase();
 }
 
+type ActiveSheet = "dados" | "horarios" | null;
+
 export function ProfileContent({ organization, overview }: ProfileContentProps) {
-  //controla abertura do dialog
+  //controla abertura do dialog de horários (dentro do painel "Horários de atendimento")
   const [DialogOpen, setDialogOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState<string[]>(organization.times ?? []);
+  const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const router = useRouter();
   //função de selecionar e desselecionar os horários
   function toggleTimeSelection(time: string) {
@@ -137,6 +157,7 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
     }
 
     toast.success("Perfil atualizado com sucesso!");
+    setActiveSheet(null);
   }
 
   async function handleSignOut() {
@@ -196,77 +217,69 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
 
       <ProfileOverview {...overview} />
 
-      {/* Assinatura */}
-      <section className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-            Assinatura
-          </h2>
-        </div>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <div>
-            {planInfo && statusMeta ? (
-              <>
-                <p className="font-medium text-foreground">Plano {planInfo.name}</p>
-                <span
-                  className={cn(
-                    "mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium",
-                    statusMeta.className,
-                  )}
-                >
-                  {statusMeta.label}
-                </span>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">Nenhum plano ativo no momento.</p>
-            )}
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/dashboard/plans">Gerenciar</Link>
-          </Button>
-        </div>
-      </section>
-
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <fieldset className="rounded-2xl border border-border bg-card p-5">
-            <legend className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              Dados do negócio
-            </legend>
-            <div className="mt-2 space-y-4">
+        {/* Menu de configurações */}
+        <nav className="overflow-hidden rounded-2xl border border-border bg-card">
+          <MenuRow
+            icon={User}
+            label="Dados do profissional"
+            onClick={() => setActiveSheet("dados")}
+          />
+          <MenuRow
+            icon={Clock}
+            label="Horários de atendimento"
+            onClick={() => setActiveSheet("horarios")}
+          />
+          <MenuRow
+            icon={CreditCard}
+            label="Assinatura"
+            trailing={planInfo ? `Plano ${planInfo.name}` : undefined}
+            href="/dashboard/plans"
+          />
+        </nav>
+
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+        >
+          <LogOut className="h-4 w-4" />
+          Sair da conta
+        </button>
+
+        {/* Painel: Dados do profissional */}
+        <Sheet open={activeSheet === "dados"} onOpenChange={(open) => !open && setActiveSheet(null)}>
+          <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
+            <SheetHeader className="border-b border-border p-5">
+              <SheetTitle>Dados do profissional</SheetTitle>
+              <SheetDescription>
+                Essas informações aparecem na sua página pública de agendamento.
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="flex-1 space-y-4 overflow-y-auto p-5">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-semibold">
-                      Nome completo
-                    </FormLabel>
+                    <FormLabel className="font-semibold">Nome completo</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Digite o nome do seu negócio."
-                      ></Input>
+                      <Input {...field} placeholder="Digite o nome do seu negócio." />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
-              ></FormField>
+              />
 
               <FormField
                 control={form.control}
                 name="segment"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel className="font-semibold">
-                      Segmento do negócio
-                    </FormLabel>
+                    <FormLabel className="font-semibold">Segmento do negócio</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione o segmento do seu negócio." />
                         </SelectTrigger>
@@ -282,34 +295,22 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                     <FormMessage />
                   </FormItem>
                 )}
-              ></FormField>
+              />
 
               <FormField
                 control={form.control}
                 name="professionalRegistration"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-semibold">
-                      Registro profissional
-                    </FormLabel>
+                    <FormLabel className="font-semibold">Registro profissional</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Ex: CREFITO 3/12345-F"
-                      ></Input>
+                      <Input {...field} placeholder="Ex: CREFITO 3/12345-F" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
-              ></FormField>
-            </div>
-          </fieldset>
+              />
 
-          <fieldset className="rounded-2xl border border-border bg-card p-5">
-            <legend className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              Contato e localização
-            </legend>
-            <div className="mt-2 space-y-4">
               <FormField
                 control={form.control}
                 name="address"
@@ -320,15 +321,12 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                       Endereço completo
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Digite o endereço do seu negócio."
-                      ></Input>
+                      <Input {...field} placeholder="Digite o endereço do seu negócio." />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
-              ></FormField>
+              />
 
               <FormField
                 control={form.control}
@@ -340,32 +338,43 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                       <Input
                         {...field}
                         placeholder="Digite o telefone do seu negócio."
-                        onChange={(e) => {
-                          const formatvalue = formatPhone(e.target.value);
-                          field.onChange(formatvalue);
-                        }}
-                      ></Input>
+                        onChange={(e) => field.onChange(formatPhone(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
-              ></FormField>
+              />
             </div>
-          </fieldset>
 
-          <fieldset className="rounded-2xl border border-border bg-card p-5">
-            <legend className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              Atendimento
-            </legend>
-            <div className="mt-2 space-y-4">
+            <SheetFooter className="border-t border-border p-5">
+              <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
+                Salvar alterações
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+
+        {/* Painel: Horários de atendimento */}
+        <Sheet
+          open={activeSheet === "horarios"}
+          onOpenChange={(open) => !open && setActiveSheet(null)}
+        >
+          <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
+            <SheetHeader className="border-b border-border p-5">
+              <SheetTitle>Horários de atendimento</SheetTitle>
+              <SheetDescription>
+                Defina quando seu negócio está aberto para agendamentos.
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="flex-1 space-y-4 overflow-y-auto p-5">
               <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel className="font-semibold">
-                      Status do negócio
-                    </FormLabel>
+                    <FormLabel className="font-semibold">Status do negócio</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -382,27 +391,21 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                     </FormControl>
                   </FormItem>
                 )}
-              ></FormField>
+              />
 
               <div className="space-y-2">
-                <Label className="font-semibold">
-                  Horários de atendimento
-                </Label>
+                <Label className="font-semibold">Horários de atendimento</Label>
 
                 <Dialog open={DialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-between"
-                    >
+                    <Button type="button" variant="outline" className="w-full justify-between">
                       <span className="flex items-center gap-1.5">
                         <Clock className="h-4 w-4" />
                         {selectedTime.length > 0
                           ? `${selectedTime.length} horários selecionados`
                           : "Clique aqui para adicionar horário"}
                       </span>
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="h-5 w-5" />
                     </Button>
                   </DialogTrigger>
 
@@ -411,12 +414,11 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                       <DialogTitle>Horário de atendimento</DialogTitle>
                       <DialogDescription>
                         <Label className="font-semibold">
-                          Selecione o horário de funcionamento do seu
-                          negócio.
+                          Selecione o horário de funcionamento do seu negócio.
                         </Label>
                       </DialogDescription>
                     </DialogHeader>
-                    <section className="mt-4 space-y-4 max-h-80 overflow-y-auto">
+                    <section className="mt-4 max-h-80 space-y-4 overflow-y-auto">
                       <div className="grid grid-cols-5 gap-2">
                         {generateTimeSlote().map((time) => (
                           <Button
@@ -425,8 +427,7 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                             variant="outline"
                             className={cn(
                               "h-10 font-mono tabular-nums",
-                              selectedTime.includes(time) &&
-                                "border-2 border-primary text-primary",
+                              selectedTime.includes(time) && "border-2 border-primary text-primary",
                             )}
                             onClick={() => toggleTimeSelection(time)}
                           >
@@ -435,11 +436,7 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                         ))}
                       </div>
                     </section>
-                    <Button
-                      type="button"
-                      className="w-full mt-4"
-                      onClick={() => setDialogOpen(false)}
-                    >
+                    <Button type="button" className="mt-4 w-full" onClick={() => setDialogOpen(false)}>
                       Salvar horários
                     </Button>
                   </DialogContent>
@@ -451,14 +448,9 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                 name="timeZone"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel className="font-semibold">
-                      Fuso horário
-                    </FormLabel>
+                    <FormLabel className="font-semibold">Fuso horário</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione o seu fuso horário." />
                         </SelectTrigger>
@@ -473,22 +465,58 @@ export function ProfileContent({ organization, overview }: ProfileContentProps) 
                     </FormControl>
                   </FormItem>
                 )}
-              ></FormField>
+              />
             </div>
-          </fieldset>
 
-          <Button className="w-full">Salvar alterações</Button>
-        </form>
+            <SheetFooter className="border-t border-border p-5">
+              <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
+                Salvar alterações
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
       </Form>
-
-      <button
-        type="button"
-        onClick={handleSignOut}
-        className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
-      >
-        <LogOut className="h-4 w-4" />
-        Sair da conta
-      </button>
     </div>
+  );
+}
+
+function MenuRow({
+  icon: Icon,
+  label,
+  trailing,
+  onClick,
+  href,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  trailing?: string;
+  onClick?: () => void;
+  href?: string;
+}) {
+  const content = (
+    <>
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="flex-1 text-left text-sm font-medium text-foreground">{label}</span>
+      {trailing && <span className="text-sm text-muted-foreground">{trailing}</span>}
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+    </>
+  );
+  const className =
+    "flex w-full items-center gap-3 border-b border-border px-4 py-3.5 text-left transition-colors last:border-0 hover:bg-secondary/60";
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      {content}
+    </button>
   );
 }

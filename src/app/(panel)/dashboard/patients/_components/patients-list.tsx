@@ -16,25 +16,13 @@ import {
 import { toast } from "sonner";
 import { updatePatientStatus } from "../_actions/update-patient-status";
 import type { Patient } from "../_data-access/get-patients";
+import { PATIENT_STATUS_META as STATUS_META, patientInitials as initials } from "../_lib/patient-status";
+import { PatientProfileSheet } from "./patient-profile-sheet";
 
 interface PatientsListProps {
   patients: Patient[];
+  organizationId: string;
 }
-
-const STATUS_META: Record<CustomerStatus, { label: string; className: string }> = {
-  AGUARDANDO: {
-    label: "Aguardando",
-    className: "bg-accent text-accent-foreground",
-  },
-  EM_TRATAMENTO: {
-    label: "Em tratamento",
-    className: "bg-primary/10 text-primary",
-  },
-  ALTA: {
-    label: "Alta",
-    className: "bg-secondary text-secondary-foreground",
-  },
-};
 
 const FILTERS: { value: CustomerStatus | "TODOS"; label: string }[] = [
   { value: "TODOS", label: "Todos" },
@@ -43,18 +31,11 @@ const FILTERS: { value: CustomerStatus | "TODOS"; label: string }[] = [
   { value: "ALTA", label: "Alta" },
 ];
 
-function initials(name: string | null) {
-  if (!name) return "?";
-  const parts = name.trim().split(/\s+/);
-  const first = parts[0]?.[0] ?? "";
-  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
-  return (first + last).toUpperCase();
-}
-
-export function PatientsList({ patients: initialPatients }: PatientsListProps) {
+export function PatientsList({ patients: initialPatients, organizationId }: PatientsListProps) {
   const [patients, setPatients] = useState(initialPatients);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<CustomerStatus | "TODOS">("TODOS");
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [, startTransition] = useTransition();
 
   const filtered = useMemo(() => {
@@ -150,7 +131,11 @@ export function PatientsList({ patients: initialPatients }: PatientsListProps) {
                 key={patient.id}
                 className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex min-w-0 items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPatient(patient)}
+                  className="flex min-w-0 items-center gap-3 rounded-lg text-left transition-colors hover:bg-secondary/60 sm:-m-2 sm:p-2"
+                >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
                     {initials(patient.name)}
                   </div>
@@ -174,7 +159,7 @@ export function PatientsList({ patients: initialPatients }: PatientsListProps) {
                         ` · última ${format(new Date(patient.lastVisitDate), "dd/MM", { locale: ptBR })}`}
                     </p>
                   </div>
-                </div>
+                </button>
 
                 <Select
                   value={patient.treatmentStatus}
@@ -205,6 +190,13 @@ export function PatientsList({ patients: initialPatients }: PatientsListProps) {
           })}
         </ul>
       )}
+
+      <PatientProfileSheet
+        patient={selectedPatient}
+        open={!!selectedPatient}
+        onOpenChange={(open) => !open && setSelectedPatient(null)}
+        organizationId={organizationId}
+      />
     </div>
   );
 }

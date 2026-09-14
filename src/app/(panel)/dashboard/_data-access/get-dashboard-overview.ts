@@ -31,7 +31,7 @@ export async function getDashboardOverview({
         organizationId,
         AppointmentDate: { gte: todayStart, lte: todayEnd },
       },
-      select: { time: true, service: { select: { duration: true } } },
+      select: { time: true, status: true, service: { select: { duration: true } } },
     }),
   ]);
 
@@ -50,12 +50,17 @@ export async function getDashboardOverview({
   }
   const occupancyToday =
     times.length > 0 ? Math.round((occupiedSlots.size / times.length) * 100) : 0;
+  const todaysInProgressCount = todaysAppointments.filter(
+    (appointment) => appointment.status === "IN_PROGRESS",
+  ).length;
 
   return {
     revenueTotal: financial.revenueTotal,
     revenueTrend: financial.revenueTrend,
     patientsThisMonth,
     occupancyToday,
+    todaysCount: todaysAppointments.length,
+    todaysInProgressCount,
   };
 }
 

@@ -32,12 +32,24 @@ export async function getPatients({ organizationId }: { organizationId: string }
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
+        image: customer.image,
+        cpf: customer.cpf,
+        address: customer.address,
         treatmentStatus: customer.treatmentStatus,
         lastVisitDate: lastVisit?.AppointmentDate ?? null,
         lastServiceName: lastVisit?.service.name ?? null,
         sessionsCompleted,
         missedCount,
         totalAppointments: customer.appointments.length,
+        history: customer.appointments.map((appointment) => ({
+          id: appointment.id,
+          date: appointment.AppointmentDate,
+          time: appointment.time,
+          status: appointment.status,
+          serviceName: appointment.service.name,
+          servicePrice: appointment.service.price,
+          serviceDuration: appointment.service.duration,
+        })),
       };
     });
 

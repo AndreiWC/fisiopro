@@ -5,6 +5,8 @@ interface LogoProps {
   iconClassName?: string;
   wordmarkClassName?: string;
   showWordmark?: boolean;
+  /** "onDark": for placement over the dark sidebar chrome. */
+  tone?: "default" | "onDark";
 }
 
 /**
@@ -16,7 +18,10 @@ export function Logo({
   iconClassName,
   wordmarkClassName,
   showWordmark = true,
+  tone = "default",
 }: LogoProps) {
+  const onDark = tone === "onDark";
+
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
       <svg
@@ -30,7 +35,8 @@ export function Logo({
       {showWordmark && (
         <span
           className={cn(
-            "font-display text-xl font-semibold tracking-tight text-foreground",
+            "font-display text-xl font-semibold tracking-tight",
+            onDark ? "text-sidebar-foreground" : "text-foreground",
             wordmarkClassName,
           )}
         >

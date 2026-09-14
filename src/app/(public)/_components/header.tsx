@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -26,12 +27,16 @@ function patientInitials(name: string | null) {
 export function Header() {
   const [isOpen, seIsOpen] = useState(false);
   const [identity, setIdentity] = useState<HeaderIdentity | null>(null);
+  const pathname = usePathname();
+  const isProfessionalsPage = pathname === "/profissionais";
 
   useEffect(() => {
     getHeaderIdentity().then(setIdentity);
   }, []);
 
-  const navItems = [{ href: "#profissionais", label: "Profissionais" }];
+  const navItems = isProfessionalsPage
+    ? [{ href: "/", label: "Buscar profissional" }]
+    : [{ href: "/profissionais", label: "Sou profissional" }];
 
   const NavLinks = () => (
     <>

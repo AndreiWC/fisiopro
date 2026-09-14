@@ -1,6 +1,15 @@
 import { Button } from "@/components/ui/button";
 import getSession from "@/lib/getSession";
-import { Calendar, PartyPopper, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  Calendar,
+  Gauge,
+  PartyPopper,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Wallet,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -19,10 +28,6 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
   style: "percent",
   maximumFractionDigits: 0,
 });
-
-const OCCUPANCY_VIEWBOX = 56;
-const OCCUPANCY_RADIUS = 24;
-const OCCUPANCY_CIRCUMFERENCE = 2 * Math.PI * OCCUPANCY_RADIUS;
 
 function firstName(name: string | null | undefined) {
   if (!name) return "";
@@ -91,48 +96,104 @@ export default async function Dashboard() {
 
       {overview && (
         <>
-          <div className="my-6 grid grid-cols-3 gap-2 sm:gap-4">
-            <div className="flex flex-col items-center rounded-xl border border-border bg-card p-3 text-center sm:p-5">
-              <p className="text-[11px] text-muted-foreground sm:text-sm">faturamento este mês</p>
-              <div className="mt-2 flex flex-wrap items-baseline justify-center gap-1.5 sm:mt-3 sm:gap-2">
-                <span className="font-mono text-lg font-semibold tabular-nums text-foreground sm:text-2xl">
+          <div className="my-6 flex flex-col gap-4 lg:flex-row">
+            <div className="grid flex-1 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:h-9 sm:w-9">
+                    <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </span>
+                  <span className="text-xs text-muted-foreground sm:text-sm">Hoje</span>
+                </div>
+                <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
+                  {overview.todaysCount}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">agendamentos</p>
+                {overview.todaysInProgressCount > 0 && (
+                  <span className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                    {overview.todaysInProgressCount} em andamento
+                  </span>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-warm/10 text-accent-warm sm:h-9 sm:w-9">
+                    <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </span>
+                  <span className="text-xs text-muted-foreground sm:text-sm">Pacientes</span>
+                </div>
+                <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
+                  {overview.patientsThisMonth}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">no mês</p>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chart-4/10 text-chart-4 sm:h-9 sm:w-9">
+                    <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </span>
+                  <span className="text-xs text-muted-foreground sm:text-sm">Faturamento (mês)</span>
+                </div>
+                <p className="mt-3 font-mono text-xl font-bold tabular-nums text-foreground sm:text-2xl">
                   {formatvalue(overview.revenueTotal.toString())}
-                </span>
+                </p>
                 {overview.revenueTrend !== null && (
                   <span
                     className={cn(
-                      "flex items-center gap-0.5 text-[10px] font-semibold sm:gap-1 sm:text-sm",
+                      "mt-1 flex items-center gap-1 text-xs font-semibold",
                       overview.revenueTrend >= 0 ? "text-primary" : "text-destructive",
                     )}
                   >
                     {overview.revenueTrend >= 0 ? (
-                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <TrendingUp className="h-3.5 w-3.5" />
                     ) : (
-                      <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <TrendingDown className="h-3.5 w-3.5" />
                     )}
                     {percentFormatter.format(Math.abs(overview.revenueTrend))}
                   </span>
                 )}
               </div>
-            </div>
 
-            <div className="flex flex-col items-center rounded-xl border border-border bg-card p-3 text-center sm:p-5">
-              <p className="text-[11px] text-muted-foreground sm:text-sm">ocupação da agenda hoje</p>
-              <div className="mt-2 sm:mt-3">
-                <OccupancyRing
-                  value={overview.occupancyToday}
-                  sizeClassName="h-10 w-10 sm:h-14 sm:w-14"
-                  textClassName="text-[10px] sm:text-sm"
-                />
+              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chart-5/10 text-chart-5 sm:h-9 sm:w-9">
+                    <Gauge className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </span>
+                  <span className="text-xs text-muted-foreground sm:text-sm">Ocupação da agenda</span>
+                </div>
+                <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
+                  {overview.occupancyToday}%
+                </p>
+                <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${overview.occupancyToday}%` }}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col items-center rounded-xl border border-border bg-card p-3 text-center sm:p-5">
-              <p className="text-[11px] text-muted-foreground sm:text-sm">pacientes este mês</p>
-              <p className="mt-2 font-mono text-lg font-semibold text-foreground sm:mt-3 sm:text-2xl">
-                {overview.patientsThisMonth}
-              </p>
-            </div>
+            {subscription?.planId !== "PROFESSIONAL" && (
+              <div className="hidden shrink-0 flex-col justify-between rounded-xl bg-sidebar p-5 text-sidebar-foreground lg:flex lg:w-64">
+                <div>
+                  <Sparkles className="h-5 w-5" />
+                  <h3 className="mt-3 font-display text-lg leading-tight font-bold">
+                    Mais espaço para o seu negócio crescer
+                  </h3>
+                  <p className="mt-2 text-sm text-sidebar-foreground/80">
+                    O plano Profissional libera até 60 clientes, 10 serviços e destaque na busca.
+                  </p>
+                </div>
+                <Link
+                  href="/dashboard/plans"
+                  className="mt-4 inline-flex items-center justify-center rounded-lg bg-sidebar-foreground px-4 py-2 text-sm font-semibold text-sidebar transition-colors hover:bg-sidebar-foreground/90"
+                >
+                  Ver planos
+                </Link>
+              </div>
+            )}
           </div>
 
           <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -149,53 +210,5 @@ export default async function Dashboard() {
         </>
       )}
     </main>
-  );
-}
-
-function OccupancyRing({
-  value,
-  sizeClassName = "h-14 w-14",
-  textClassName = "text-sm",
-}: {
-  value: number;
-  sizeClassName?: string;
-  textClassName?: string;
-}) {
-  const dashOffset = OCCUPANCY_CIRCUMFERENCE * (1 - value / 100);
-  const center = OCCUPANCY_VIEWBOX / 2;
-
-  return (
-    <div className={cn("relative shrink-0", sizeClassName)}>
-      <svg
-        viewBox={`0 0 ${OCCUPANCY_VIEWBOX} ${OCCUPANCY_VIEWBOX}`}
-        className={cn("-rotate-90", sizeClassName)}
-      >
-        <circle
-          cx={center}
-          cy={center}
-          r={OCCUPANCY_RADIUS}
-          strokeWidth="6"
-          className="fill-none stroke-muted"
-        />
-        <circle
-          cx={center}
-          cy={center}
-          r={OCCUPANCY_RADIUS}
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeDasharray={OCCUPANCY_CIRCUMFERENCE}
-          strokeDashoffset={dashOffset}
-          className="fill-none stroke-primary"
-        />
-      </svg>
-      <span
-        className={cn(
-          "absolute inset-0 flex items-center justify-center font-mono font-semibold text-foreground",
-          textClassName,
-        )}
-      >
-        {value}%
-      </span>
-    </div>
   );
 }
