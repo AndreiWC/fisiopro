@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
+import { buildOccupantMap } from "@/utils/slot-occupancy";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -45,21 +46,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const blockSlotes = new Set<string>();
-    for (const appointment of appointments) {
-      const requiredSlots = Math.ceil(appointment.service.duration / 30);
-      const startIndex = organization.times.indexOf(appointment.time);
-
-      if (startIndex !== -1) {
-        for (let i = 0; i < requiredSlots; i++) {
-          const blockedSlot = organization.times[startIndex + i];
-          if (blockedSlot) {
-            blockSlotes.add(blockedSlot);
-          }
-        }
-      }
-    }
-    const blockedTimes = Array.from(blockSlotes);
+    const occupantMap = buildOccupantMap(appointments, organization.times);
+    const blockedTimes = Array.from(occupantMap.keys());
     return NextResponse.json(blockedTimes);
   } catch (error) {
     console.error("Erro ao buscar agendamentos:", error);

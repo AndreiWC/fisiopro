@@ -3,8 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
 
 function parseDateParam(value: string | null) {
   if (!value) return new Date();
@@ -24,18 +24,21 @@ export function CalendarCard() {
   }
 
   return (
-    <Card className="gap-2 p-2">
-      <CardHeader className="px-2 pt-1 pb-0">
-        <CardTitle className="text-base font-semibold">Calendário</CardTitle>
+    <Card className="gap-2 p-3">
+      <CardHeader className="p-0">
+        <CardTitle className="text-base font-bold">Calendário</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-center px-0 pb-1">
+      <CardContent className="p-0">
         <Calendar
           mode="single"
           locale={ptBR}
           selected={selected}
           defaultMonth={selected}
-          onSelect={(date) => date && selectDate(date)}
-          className="p-0"
+          onSelect={(date) => {
+            if (!date) return;
+            selectDate(date);
+          }}
+          className="mx-auto p-0 [--cell-size:--spacing(7)]"
         />
       </CardContent>
     </Card>

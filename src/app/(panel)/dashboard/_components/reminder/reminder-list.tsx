@@ -35,8 +35,8 @@ export function ReminderList({ reminder }: ReminderListProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-3">
-      <Card className="p-2 gap-2">
+    <div className="flex flex-col gap-3 lg:h-full">
+      <Card className="gap-2 overflow-hidden p-2 lg:h-full lg:min-h-0">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 px-2">
           <CardTitle className="text-xl md:text-2xl">Lembretes</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -62,7 +62,7 @@ export function ReminderList({ reminder }: ReminderListProps) {
             Nenhum lembrete para hoje.
           </p>
         )}
-        <ScrollArea className="h-[340px] lg:max-h-[calc(100vh-15rem)] pr-0 w-full flex-1">
+        <ScrollArea className="h-[340px] w-full flex-1 pr-0 lg:h-40">
           {reminder.map((item) => (
             <article
               key={item.id}

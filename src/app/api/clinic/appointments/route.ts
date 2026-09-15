@@ -31,10 +31,11 @@ export const GET = auth(async function GET(request) {
     const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0)); // Cria a data no formato UTC
     const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999)); // Cria a data no formato UTC
 
+    // Traz também os cancelados (o front filtra: eles não ocupam horário na
+    // agenda, mas entram na contagem do indicador "Cancelados" do dia).
     const appointments = await prisma.appointments.findMany({
       where: {
         organizationId: organization.id,
-        status: { not: "CANCELLED" },
         AppointmentDate: {
           gte: startDate,
           lte: endDate,

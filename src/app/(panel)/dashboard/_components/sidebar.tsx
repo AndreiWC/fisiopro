@@ -140,7 +140,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div
-        className={clsx("flex flex-1 flex-col pb-16 transition-all duration-300 md:pb-0", {
+        className={clsx("flex min-w-0 flex-1 flex-col pb-16 transition-all duration-300 md:pb-0", {
           "md:ml-20": isCollapsed,
           "md:ml-64": !isCollapsed,
         })}

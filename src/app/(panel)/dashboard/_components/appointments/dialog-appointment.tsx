@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AppointmentWithService, STATUS_META } from "./appointments-list";
+import { AppointmentWithService, STATUS_META } from "../agenda/day-view";
 import { format } from "date-fns";
 import { formatvalueToReal } from "@/utils/formatValue";
 import { cn } from "@/lib/utils";

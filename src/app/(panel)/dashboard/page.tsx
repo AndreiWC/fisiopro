@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import getSession from "@/lib/getSession";
 import {
   Calendar,
@@ -15,7 +14,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ButtonCopyLink } from "./_components/button-copy-link";
 import { Reminders } from "./_components/reminder/reminders";
-import { Appointments } from "./_components/appointments/appointments";
+import { Agenda } from "./_components/agenda/agenda";
 import { CalendarCard } from "./_components/calendar-card";
 import { checkSubscription } from "@/utils/permissions/checkSubscripion";
 import { LabelSubscription } from "@/components/ui/label-subscription";
@@ -69,16 +68,7 @@ export default async function Dashboard() {
           <p className="mt-2 text-sm text-muted-foreground">{todayLabel}</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Link href={`/clinica/${organization.id}`} target="_blank" className="flex-1 sm:flex-none">
-            <Button size="lg" className="w-full gap-2 px-6 sm:w-auto">
-              <Calendar className="h-5 w-5" />
-              <span>Novo agendamento</span>
-            </Button>
-          </Link>
-
-          <ButtonCopyLink organizationId={organization.id} />
-        </div>
+        <ButtonCopyLink organizationId={organization.id} />
       </div>
 
       {subscription?.subscriptionStatus === "EXPIRED" && (
@@ -96,115 +86,124 @@ export default async function Dashboard() {
 
       {overview && (
         <>
-          <div className="my-6 flex flex-col gap-4 lg:flex-row">
-            <div className="grid flex-1 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:h-9 sm:w-9">
-                    <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </span>
-                  <span className="text-xs text-muted-foreground sm:text-sm">Hoje</span>
-                </div>
-                <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
-                  {overview.todaysCount}
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">agendamentos</p>
-                {overview.todaysInProgressCount > 0 && (
-                  <span className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {overview.todaysInProgressCount} em andamento
-                  </span>
-                )}
-              </div>
-
-              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-warm/10 text-accent-warm sm:h-9 sm:w-9">
-                    <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </span>
-                  <span className="text-xs text-muted-foreground sm:text-sm">Pacientes</span>
-                </div>
-                <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
-                  {overview.patientsThisMonth}
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">no mês</p>
-              </div>
-
-              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chart-4/10 text-chart-4 sm:h-9 sm:w-9">
-                    <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </span>
-                  <span className="text-xs text-muted-foreground sm:text-sm">Faturamento (mês)</span>
-                </div>
-                <p className="mt-3 font-mono text-xl font-bold tabular-nums text-foreground sm:text-2xl">
-                  {formatvalue(overview.revenueTotal.toString())}
-                </p>
-                {overview.revenueTrend !== null && (
-                  <span
-                    className={cn(
-                      "mt-1 flex items-center gap-1 text-xs font-semibold",
-                      overview.revenueTrend >= 0 ? "text-primary" : "text-destructive",
-                    )}
-                  >
-                    {overview.revenueTrend >= 0 ? (
-                      <TrendingUp className="h-3.5 w-3.5" />
-                    ) : (
-                      <TrendingDown className="h-3.5 w-3.5" />
-                    )}
-                    {percentFormatter.format(Math.abs(overview.revenueTrend))}
-                  </span>
-                )}
-              </div>
-
-              <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chart-5/10 text-chart-5 sm:h-9 sm:w-9">
-                    <Gauge className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </span>
-                  <span className="text-xs text-muted-foreground sm:text-sm">Ocupação da agenda</span>
-                </div>
-                <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
-                  {overview.occupancyToday}%
-                </p>
-                <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${overview.occupancyToday}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {subscription?.planId !== "PROFESSIONAL" && (
-              <div className="hidden shrink-0 flex-col justify-between rounded-xl bg-sidebar p-5 text-sidebar-foreground lg:flex lg:w-64">
-                <div>
-                  <Sparkles className="h-5 w-5" />
-                  <h3 className="mt-3 font-display text-lg leading-tight font-bold">
-                    Mais espaço para o seu negócio crescer
-                  </h3>
-                  <p className="mt-2 text-sm text-sidebar-foreground/80">
-                    O plano Profissional libera até 60 clientes, 10 serviços e destaque na busca.
+          <section className="my-6 space-y-4">
+            <div className="flex flex-col gap-4 lg:flex-row">
+              <div className="grid flex-1 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+                <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:h-9 sm:w-9">
+                      <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    </span>
+                    <span className="text-xs text-muted-foreground sm:text-sm">Hoje</span>
+                  </div>
+                  <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
+                    {overview.todaysCount}
                   </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">agendamentos</p>
+                  {overview.todaysInProgressCount > 0 && (
+                    <span className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                      {overview.todaysInProgressCount} em andamento
+                    </span>
+                  )}
                 </div>
-                <Link
-                  href="/dashboard/plans"
-                  className="mt-4 inline-flex items-center justify-center rounded-lg bg-sidebar-foreground px-4 py-2 text-sm font-semibold text-sidebar transition-colors hover:bg-sidebar-foreground/90"
-                >
-                  Ver planos
-                </Link>
-              </div>
-            )}
-          </div>
 
-          <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <Appointments organizationId={organization.id} />
-            <div className="flex flex-col gap-4">
+                <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-warm/10 text-accent-warm sm:h-9 sm:w-9">
+                      <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    </span>
+                    <span className="text-xs text-muted-foreground sm:text-sm">Pacientes</span>
+                  </div>
+                  <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
+                    {overview.patientsThisMonth}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">no mês</p>
+                </div>
+
+                <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chart-4/10 text-chart-4 sm:h-9 sm:w-9">
+                      <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    </span>
+                    <span className="text-xs text-muted-foreground sm:text-sm">
+                      Faturamento (mês)
+                    </span>
+                  </div>
+                  <p className="mt-3 font-mono text-xl font-bold tabular-nums text-foreground sm:text-2xl">
+                    {formatvalue(overview.revenueTotal.toString())}
+                  </p>
+                  {overview.revenueTrend !== null && (
+                    <span
+                      className={cn(
+                        "mt-1 flex items-center gap-1 text-xs font-semibold",
+                        overview.revenueTrend >= 0 ? "text-primary" : "text-destructive",
+                      )}
+                    >
+                      {overview.revenueTrend >= 0 ? (
+                        <TrendingUp className="h-3.5 w-3.5" />
+                      ) : (
+                        <TrendingDown className="h-3.5 w-3.5" />
+                      )}
+                      {percentFormatter.format(Math.abs(overview.revenueTrend))}
+                    </span>
+                  )}
+                </div>
+
+                <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chart-5/10 text-chart-5 sm:h-9 sm:w-9">
+                      <Gauge className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    </span>
+                    <span className="text-xs text-muted-foreground sm:text-sm">
+                      Ocupação da agenda
+                    </span>
+                  </div>
+                  <p className="mt-3 font-mono text-xl font-bold text-foreground sm:text-2xl">
+                    {overview.occupancyToday}%
+                  </p>
+                  <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${overview.occupancyToday}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {subscription?.planId !== "PROFESSIONAL" && (
+                <div className="hidden shrink-0 flex-col justify-between rounded-xl bg-sidebar p-5 text-sidebar-foreground lg:flex lg:w-64">
+                  <div>
+                    <Sparkles className="h-5 w-5" />
+                    <h3 className="mt-3 font-display text-lg leading-tight font-bold">
+                      Mais espaço para o seu negócio crescer
+                    </h3>
+                    <p className="mt-2 text-sm text-sidebar-foreground/80">
+                      O plano Profissional libera até 60 clientes, 10 serviços e destaque na
+                      busca.
+                    </p>
+                  </div>
+                  <Link
+                    href="/dashboard/plans"
+                    className="mt-4 inline-flex items-center justify-center rounded-lg bg-sidebar-foreground px-4 py-2 text-sm font-semibold text-sidebar transition-colors hover:bg-sidebar-foreground/90"
+                  >
+                    Ver planos
+                  </Link>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="my-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+            <Agenda organizationId={organization.id} />
+            <div className="flex flex-col gap-4 lg:h-[38rem]">
               <div className="hidden lg:block">
                 <Suspense fallback={null}>
                   <CalendarCard />
                 </Suspense>
               </div>
-              <Reminders organizationId={organization.id} />
+              <div className="min-h-0 lg:flex-1">
+                <Reminders organizationId={organization.id} />
+              </div>
             </div>
           </section>
         </>

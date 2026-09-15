@@ -4,10 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format, addDays, isSameDay, isToday, differenceInCalendarDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 function parseDateParam(value: string | null) {
   if (!value) return new Date();
@@ -19,10 +17,6 @@ function startOfDay(date: Date) {
   const copy = new Date(date);
   copy.setHours(0, 0, 0, 0);
   return copy;
-}
-
-function capitalizeFirst(text: string) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 const PAGE_SIZE = 14;
@@ -39,7 +33,6 @@ export function DayStrip() {
 
   const [rangeStart, setRangeStart] = useState(() => addDays(today, -INITIAL_PAST_DAYS));
   const [rangeEnd, setRangeEnd] = useState(() => addDays(today, INITIAL_FUTURE_DAYS));
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     if (selected < rangeStart) setRangeStart(selected);
@@ -122,30 +115,6 @@ export function DayStrip() {
 
   return (
     <div className="w-full min-w-0">
-      <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="mb-1.5 flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            {capitalizeFirst(format(selected, "MMMM 'de' yyyy", { locale: ptBR }))}
-            <ChevronDown className="h-3 w-3" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            locale={ptBR}
-            selected={selected}
-            defaultMonth={selected}
-            onSelect={(date) => {
-              if (!date) return;
-              selectDate(date);
-              setPickerOpen(false);
-            }}
-          />
-        </PopoverContent>
-      </Popover>
       <div className="flex items-center gap-1">
         <button
           type="button"

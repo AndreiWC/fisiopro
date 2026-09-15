@@ -1,8 +1,8 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { startOfDay, startOfMonth, endOfDay } from "date-fns";
 import { getFinancialSummary } from "../financeiro/_data-access/get-financial-summary";
+import { buildOccupantMap, computeOccupancyPercent } from "@/utils/slot-occupancy";
 
 interface GetDashboardOverviewParams {
   organizationId: string;
@@ -14,9 +14,17 @@ export async function getDashboardOverview({
   times,
 }: GetDashboardOverviewParams) {
   const now = new Date();
-  const monthStart = startOfMonth(now);
-  const todayStart = startOfDay(now);
-  const todayEnd = endOfDay(now);
+  // AppointmentDate é sempre salvo em UTC-meia-noite exata (ver day route),
+  // então os limites de "hoje"/"este mês" precisam ser calculados em UTC a
+  // partir da data local — usar startOfDay/startOfMonth (fuso local) desalinha
+  // esses limites e faz agendamentos de hoje ficarem de fora da contagem.
+  const monthStart = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0));
+  const todayStart = new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0),
+  );
+  const todayEnd = new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999),
+  );
 
   const [financial, patientsThisMonth, todaysAppointments] = await Promise.all([
     getFinancialSummary({ organizationId, period: "ESTE_MES" }),
@@ -35,21 +43,11 @@ export async function getDashboardOverview({
     }),
   ]);
 
-  // Mesma lógica de ocupação usada no dia selecionado da agenda (appointments-list,
+  // Mesma lógica de ocupação usada no dia selecionado da agenda (day-view,
   // que também não exclui nenhum status), aqui fixada em "hoje" para virar um KPI
   // de topo de página — os dois números precisam bater quando o dia selecionado é hoje.
-  const occupiedSlots = new Set<string>();
-  for (const appointment of todaysAppointments) {
-    const requiredSlots = Math.ceil(appointment.service.duration / 30);
-    const startIndex = times.indexOf(appointment.time);
-    if (startIndex === -1) continue;
-    for (let i = 0; i < requiredSlots; i++) {
-      const slot = times[startIndex + i];
-      if (slot) occupiedSlots.add(slot);
-    }
-  }
-  const occupancyToday =
-    times.length > 0 ? Math.round((occupiedSlots.size / times.length) * 100) : 0;
+  const occupantMap = buildOccupantMap(todaysAppointments, times);
+  const occupancyToday = computeOccupancyPercent(occupantMap.size, times.length);
   const todaysInProgressCount = todaysAppointments.filter(
     (appointment) => appointment.status === "IN_PROGRESS",
   ).length;
