@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Folder,
+  ListChecks,
   LogOut,
   Settings,
   UserCircle,
@@ -23,6 +24,7 @@ import { Logo } from "@/components/brand/logo";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Agendamentos", icon: CalendarCheck2 },
+  { href: "/dashboard/atendimentos", label: "Atendimentos", icon: ListChecks },
   { href: "/dashboard/patients", label: "Pacientes", icon: Users },
   { href: "/dashboard/services", label: "Serviços", icon: Folder },
   { href: "/dashboard/financeiro", label: "Financeiro", icon: Wallet },
@@ -35,11 +37,21 @@ const SETTINGS_ITEMS = [
 
 const BOTTOM_TAB_ITEMS = [
   { href: "/dashboard", label: "Agenda", icon: CalendarCheck2 },
+  { href: "/dashboard/atendimentos", label: "Atend.", icon: ListChecks },
   { href: "/dashboard/patients", label: "Pacientes", icon: Users },
   { href: "/dashboard/financeiro", label: "Financeiro", icon: Wallet },
   { href: "/dashboard/services", label: "Serviços", icon: Folder },
-  { href: "/dashboard/profile", label: "Perfil", icon: Settings },
 ] as const;
+
+const MOBILE_HEADER_TITLES: Record<string, string> = {
+  "/dashboard": "Agenda",
+  "/dashboard/atendimentos": "Atendimentos",
+  "/dashboard/patients": "Pacientes",
+  "/dashboard/services": "Serviços",
+  "/dashboard/financeiro": "Financeiro",
+  "/dashboard/profile": "Meu perfil",
+  "/dashboard/plans": "Planos",
+};
 
 function initials(name: string | null | undefined) {
   if (!name) return "?";
@@ -146,19 +158,22 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
         })}
       >
         <header className="sticky top-0 z-10 flex h-14 items-center justify-between bg-sidebar px-4 md:hidden">
-          <Link href="/dashboard">
-            <Logo tone="onDark" iconClassName="h-6 w-6" wordmarkClassName="text-base" />
+          <Link href="/dashboard" aria-label="Ir para a agenda" className="shrink-0">
+            <Logo tone="onDark" iconClassName="h-6 w-6" showWordmark={false} />
           </Link>
+          <p className="flex-1 truncate text-center text-sm font-medium text-sidebar-foreground">
+            {MOBILE_HEADER_TITLES[pathname] ?? ""}
+          </p>
           <Link
             href="/dashboard/profile"
             aria-label="Meu perfil"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground"
           >
             <UserCircle className="h-5 w-5" />
           </Link>
         </header>
 
-        <main className="flex-1 px-2 py-4 md:p-6">{children}</main>
+        <main className="flex-1 px-4 py-4 md:p-6">{children}</main>
       </div>
 
       <nav

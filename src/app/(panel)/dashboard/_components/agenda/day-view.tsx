@@ -93,6 +93,9 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
       return;
     }
     queryClient.invalidateQueries({ queryKey: ["get-appointments"] });
+    queryClient.invalidateQueries({ queryKey: ["get-week-appointments"] });
+    queryClient.invalidateQueries({ queryKey: ["get-month-appointments-summary"] });
+    queryClient.invalidateQueries({ queryKey: ["attendance-list"] });
   }
 
   return (

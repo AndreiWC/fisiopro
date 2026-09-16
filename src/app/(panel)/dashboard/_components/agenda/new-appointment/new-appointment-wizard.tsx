@@ -98,6 +98,7 @@ export function NewAppointmentWizard({
     queryClient.invalidateQueries({ queryKey: ["get-appointments"] });
     queryClient.invalidateQueries({ queryKey: ["get-week-appointments"] });
     queryClient.invalidateQueries({ queryKey: ["get-month-appointments-summary"] });
+    queryClient.invalidateQueries({ queryKey: ["attendance-list"] });
 
     toast.success("Agendamento criado com sucesso!");
     onDone();

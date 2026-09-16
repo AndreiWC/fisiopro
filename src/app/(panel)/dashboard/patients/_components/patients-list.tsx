@@ -169,7 +169,7 @@ export function PatientsList({ patients: initialPatients, organizationId }: Pati
                 >
                   <SelectTrigger
                     className={cn(
-                      "h-8 w-fit shrink-0 gap-1.5 rounded-full border-0 px-3 text-xs font-medium shadow-none",
+                      "h-9 w-fit shrink-0 gap-1.5 rounded-full border-0 px-3.5 text-xs font-medium shadow-none",
                       meta.className,
                     )}
                   >
