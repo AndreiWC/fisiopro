@@ -4,20 +4,11 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Prisma, Segment } from "@prisma/client";
-import {
-  Activity,
-  ArrowRight,
-  Flower2,
-  MapPin,
-  Scissors,
-  Search,
-  Smile,
-  Sparkles,
-  Stethoscope,
-} from "lucide-react";
+import { ArrowRight, MapPin, Search } from "lucide-react";
 import fotoImg from "../../../../public/phaceholder 3.png";
-import { SEGMENT_OPTIONS } from "@/utils/segments";
-import { cn } from "@/lib/utils";
+import { segmentLabel } from "@/utils/segments";
+import { CategoryGrid } from "./category-grid";
+import { HowItWorks } from "./how-it-works";
 import { PremiumBadge } from "./premium-badge";
 
 type OrganizationWithServiceAndSubscriptions = Prisma.OrganizationGetPayload<{
@@ -31,15 +22,6 @@ interface PatientDiscoveryProps {
   professionals: OrganizationWithServiceAndSubscriptions[];
 }
 
-const SEGMENT_ICONS: Record<Segment, typeof Scissors> = {
-  BARBEARIA: Scissors,
-  SALAO_BELEZA: Sparkles,
-  CLINICA_ESTETICA: Flower2,
-  FISIOTERAPIA: Activity,
-  ODONTOLOGIA: Smile,
-  MEDICO: Stethoscope,
-};
-
 function isFeatured(professional: OrganizationWithServiceAndSubscriptions) {
   return (
     professional.subscription?.status === "active" &&
@@ -47,12 +29,14 @@ function isFeatured(professional: OrganizationWithServiceAndSubscriptions) {
   );
 }
 
-/** Marca "encaixe": os dois blocos que dão nome à Encaixa, usados como respiro visual. */
-function EncaixeMark({ className }: { className?: string }) {
+/** Marca "encaixe": os dois blocos que dão nome à Encaixa, ampliados como peça gráfica do herói. */
+function HeroMark() {
   return (
-    <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>
-      <rect x="2" y="6" width="20" height="20" rx="7" className="fill-primary" />
-      <rect x="17" y="11" width="13" height="13" rx="4" className="fill-accent-warm" />
+    <svg viewBox="0 0 200 200" aria-hidden="true" className="h-full w-full">
+      <rect x="12" y="10" width="44" height="44" rx="16" className="fill-sidebar-foreground/10" />
+      <rect x="108" y="16" width="58" height="58" rx="20" className="fill-sidebar-foreground/10" />
+      <rect x="20" y="68" width="98" height="98" rx="30" className="fill-primary" />
+      <rect x="98" y="118" width="70" height="70" rx="22" className="fill-accent-warm" />
     </svg>
   );
 }
@@ -60,6 +44,15 @@ function EncaixeMark({ className }: { className?: string }) {
 export function PatientDiscovery({ professionals }: PatientDiscoveryProps) {
   const [query, setQuery] = useState("");
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
+
+  const counts = useMemo(() => {
+    const record = {} as Record<Segment, number>;
+    for (const professional of professionals) {
+      if (!professional.segment) continue;
+      record[professional.segment] = (record[professional.segment] ?? 0) + 1;
+    }
+    return record;
+  }, [professionals]);
 
   const bySegment = useMemo(() => {
     if (!activeSegment) return professionals;
@@ -80,113 +73,95 @@ export function PatientDiscovery({ professionals }: PatientDiscoveryProps) {
   const featured = bySegment.filter(isFeatured).slice(0, 6);
   const spotlight = featured.length > 0 ? featured : bySegment.slice(0, 4);
 
-  const activeLabel = SEGMENT_OPTIONS.find((s) => s.value === activeSegment)?.label;
+  const activeLabel = segmentLabel(activeSegment);
 
   return (
     <>
-      <section className="relative overflow-hidden rounded-b-[2.5rem] bg-gradient-to-b from-accent/60 via-background to-background pt-28 pb-10 text-foreground sm:rounded-b-[3rem]">
-        <EncaixeMark className="pointer-events-none absolute -top-10 -right-14 h-56 w-56 opacity-[0.08] blur-[1px]" />
-        <EncaixeMark className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rotate-12 opacity-[0.06]" />
+      <section className="relative overflow-hidden rounded-b-[2.5rem] bg-sidebar pt-28 pb-16 text-sidebar-foreground sm:rounded-b-[3rem]">
+        <div className="pointer-events-none absolute -top-16 -right-24 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-accent-warm/10 blur-3xl" />
 
-        <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-sm font-medium text-muted-foreground">
-            Para você que cuida da saúde e do corpo
-          </p>
-          <h1 className="font-display mt-2 max-w-lg text-3xl font-semibold leading-[1.1] tracking-tight sm:text-4xl">
-            Encontre um horário que se encaixa na sua rotina.
-          </h1>
+        <div className="container relative mx-auto flex flex-col gap-10 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:px-8">
+          <div className="relative z-10 max-w-xl">
+            <p className="text-sm font-medium text-sidebar-foreground/70">
+              Para quem cuida da beleza, da saúde e do corpo
+            </p>
+            <h1 className="font-display mt-2 text-3xl font-semibold leading-[1.1] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+              Encontre um horário que se encaixa na sua rotina.
+            </h1>
 
-          <div className="relative mt-7 max-w-xl">
-            <Search className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              type="text"
-              placeholder="Nome, serviço ou endereço"
-              className="h-14 w-full rounded-full border border-border bg-card pr-4 pl-12 text-base text-foreground shadow-lg outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            />
+            <div className="relative mt-7 max-w-xl">
+              <Search className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                type="text"
+                placeholder="Nome, serviço ou endereço"
+                className="h-14 w-full rounded-full border border-transparent bg-card pr-4 pl-12 text-base text-foreground shadow-lg outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              />
+            </div>
+
+            <p className="mt-4 text-sm text-sidebar-foreground/60">
+              {professionals.length > 0
+                ? `${professionals.length} ${professionals.length === 1 ? "profissional disponível" : "profissionais disponíveis"} agora`
+                : "Novos profissionais chegando em breve"}
+            </p>
           </div>
 
-          <div className="relative mt-5 max-w-xl">
-            <div className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1">
-              <button
-                type="button"
-                onClick={() => setActiveSegment(null)}
-                aria-pressed={activeSegment === null}
-                className={cn(
-                  "shrink-0 snap-start rounded-full border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
-                  activeSegment === null
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-secondary/60 text-foreground hover:bg-secondary",
-                )}
-              >
-                Todas
-              </button>
-              {SEGMENT_OPTIONS.map(({ value, label }) => {
-                const Icon = SEGMENT_ICONS[value];
-                const isActive = activeSegment === value;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setActiveSegment(isActive ? null : value)}
-                    aria-pressed={isActive}
-                    className={cn(
-                      "flex shrink-0 snap-start items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
-                      isActive
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-secondary/60 text-foreground hover:bg-secondary",
-                    )}
-                  >
-                    <Icon className="h-4 w-4" strokeWidth={1.75} />
-                    {label}
-                  </button>
-                );
-              })}
+          <div className="relative z-10 hidden shrink-0 lg:block">
+            <div className="h-64 w-64 xl:h-72 xl:w-72">
+              <HeroMark />
             </div>
-            <div
-              aria-hidden
-              className="pointer-events-none absolute top-0 right-0 h-full w-10 bg-linear-to-r from-transparent to-background"
-            />
           </div>
-
-          {spotlight.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-sm font-semibold text-foreground">
-                {featured.length > 0 ? "Profissionais em destaque" : "Comece por aqui"}
-              </h2>
-              <div className="scrollbar-none mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-                {spotlight.map((professional) => {
-                  return (
-                    <Link
-                      key={professional.id}
-                      href={`/clinica/${professional.id}`}
-                      className="w-40 shrink-0 snap-start rounded-2xl border border-border bg-card p-3 transition-colors hover:border-primary/50"
-                    >
-                      <div className="relative h-24 w-full overflow-hidden rounded-xl">
-                        <Image
-                          src={professional.image ? professional.image : fotoImg}
-                          alt={`Foto de ${professional.name ?? "profissional"}`}
-                          fill
-                          sizes="160px"
-                          className="object-cover"
-                        />
-                        {isFeatured(professional) && <PremiumBadge />}
-                      </div>
-                      <p className="mt-2 truncate text-sm font-medium text-foreground">
-                        {professional.name}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {professional.address || "Endereço não informado"}
-                      </p>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </section>
+
+      <CategoryGrid counts={counts} activeSegment={activeSegment} onSelect={setActiveSegment} />
+
+      <HowItWorks />
+
+      {spotlight.length > 0 && (
+        <section className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+          <h2 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+            {featured.length > 0 ? "Profissionais em destaque" : "Comece por aqui"}
+          </h2>
+          <div className="scrollbar-none mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
+            {spotlight.map((professional) => {
+              const label = segmentLabel(professional.segment);
+              return (
+                <Link
+                  key={professional.id}
+                  href={`/clinica/${professional.id}`}
+                  className="w-52 shrink-0 snap-start rounded-2xl border border-border bg-card p-3 transition-colors hover:border-primary/50"
+                >
+                  <div className="relative h-32 w-full overflow-hidden rounded-xl">
+                    <Image
+                      src={professional.image ? professional.image : fotoImg}
+                      alt={`Foto de ${professional.name ?? "profissional"}`}
+                      fill
+                      sizes="208px"
+                      className="object-cover"
+                    />
+                    {isFeatured(professional) && <PremiumBadge />}
+                  </div>
+                  <p className="mt-2.5 truncate text-sm font-medium text-foreground">
+                    {professional.name}
+                  </p>
+                  <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    {professional.address || "Endereço não informado"}
+                  </p>
+                  {label && (
+                    <span className="mt-2 inline-block rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                      {label}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section id="profissionais" className="container mx-auto px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-4 flex items-center justify-between">
@@ -200,10 +175,12 @@ export function PatientDiscovery({ professionals }: PatientDiscoveryProps) {
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
-            <EncaixeMark className="h-10 w-10 opacity-40" />
+            <div className="h-10 w-10 opacity-40">
+              <HeroMark />
+            </div>
             <p className="text-muted-foreground">
               {query
-                ? `Nenhum profissional encontrado para “${query}”.`
+                ? `Nenhum profissional encontrado para "${query}".`
                 : "Nenhum profissional encontrado neste segmento."}
             </p>
           </div>

@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import type { Prisma, AppointmentStatus } from "@prisma/client";
@@ -120,7 +119,7 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
               onNewAppointment={() => onSlotClick()}
             />
           ) : (
-            <ScrollArea className="h-[calc(100vh-30rem)] pr-4 lg:h-84">
+            <div className="h-[calc(100vh-30rem)] overflow-y-auto pr-4 lg:h-84">
               {times.map((slot) => {
                 const occupant = occupantMap.get(slot);
 
@@ -165,6 +164,7 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
                       <Button
                         variant="ghost"
                         size="icon-sm"
+                        className="hidden shrink-0 sm:inline-flex"
                         onClick={() => setSelectedAppointment(occupant)}
                       >
                         <Eye className="h-4 w-4" />
@@ -175,7 +175,7 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
 
                 return <EmptySlotRow key={slot} time={slot} onClick={() => onSlotClick(slot)} />;
               })}
-            </ScrollArea>
+            </div>
           )}
         </div>
 

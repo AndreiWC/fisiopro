@@ -1,4 +1,4 @@
-"user client"; // roda no lado cliente
+"use client";
 
 import {
   DialogHeader,
@@ -40,18 +40,28 @@ interface DialogServiceProps {
     hours: string;
     minutes: string;
   } | null;
+  onDelete?: () => void | Promise<void>;
 }
 
 export function DialogService({
   closeModal,
   serviceId,
   initialValues,
+  onDelete,
 }: DialogServiceProps) {
   const form = useDialogServiceForm({
     initialValues: initialValues || undefined,
   });
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
+
+  async function handleDelete() {
+    if (!onDelete) return;
+    setDeleting(true);
+    await onDelete();
+    setDeleting(false);
+  }
 
   async function onSubmit(value: DialogServiceFormData) {
     setLoading(true);
@@ -123,10 +133,12 @@ export function DialogService({
     <>
       <DialogHeader>
         <DialogTitle className="text-lg font-semibold">
-          Novo Serviço
+          {serviceId ? "Editar serviço" : "Novo serviço"}
         </DialogTitle>
         <DialogDescription>
-          Adicione um novo serviço para o seu negócio.
+          {serviceId
+            ? "Atualize o nome, o preço ou a duração deste serviço."
+            : "Adicione um novo serviço para o seu negócio."}
         </DialogDescription>
       </DialogHeader>
 
@@ -201,11 +213,25 @@ export function DialogService({
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || deleting}>
               {loading
-                ? "Cadastrando..."
-                : `${serviceId ? "Atualizar Serviço" : "Cadastrar Serviço"}`}
+                ? "Salvando..."
+                : serviceId
+                  ? "Salvar alterações"
+                  : "Cadastrar serviço"}
             </Button>
+
+            {serviceId && onDelete && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+                disabled={loading || deleting}
+                onClick={handleDelete}
+              >
+                {deleting ? "Excluindo..." : "Excluir serviço"}
+              </Button>
+            )}
           </div>
         </form>
       </Form>

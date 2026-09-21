@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Reminder } from "@prisma/client";
 import { Plus, Trash } from "lucide-react";
 import { deleteReminder } from "../../_actions/delete-reminder";
@@ -62,26 +61,26 @@ export function ReminderList({ reminder }: ReminderListProps) {
             Nenhum lembrete para hoje.
           </p>
         )}
-        <ScrollArea className="h-[340px] w-full flex-1 pr-0 lg:h-40">
+        <div className="h-85 w-full flex-1 overflow-y-auto pr-0 lg:h-40">
           {reminder.map((item) => (
             <article
               key={item.id}
-              className="flex flex-wrap flex-row items-center justify-between py-2 bg-accent px-2 mb-2 rounded-md"
+              className="flex items-center justify-between gap-2 py-2 bg-accent px-2 mb-2 rounded-md"
             >
-              <p className="text-sm text-accent-foreground">
+              <p className="min-w-0 flex-1 truncate text-sm text-accent-foreground">
                 {item.description}
               </p>
               <Button
                 variant="ghost"
                 size="icon-sm"
-                className="rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+                className="shrink-0 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => handleDeleteReminder(item.id)}
               >
                 <Trash className="w-3.5 h-3.5" />
               </Button>
             </article>
           ))}
-        </ScrollArea>
+        </div>
         <CardContent></CardContent>
       </Card>
     </div>

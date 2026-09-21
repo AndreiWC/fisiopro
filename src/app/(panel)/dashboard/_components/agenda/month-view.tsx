@@ -13,7 +13,6 @@ import {
   isSameMonth,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { RangeNav } from "./range-nav";
 import { SummaryCard } from "./summary-card";
 import { MonthDayCell } from "./month-day-cell";
@@ -102,7 +101,7 @@ export function MonthView({ selectedDate, onChangeDate, onDayClick }: MonthViewP
               </div>
             ))}
           </div>
-          <ScrollArea className="lg:h-100">
+          <div className="overflow-y-auto lg:h-100">
             <div className="grid grid-cols-7">
               {gridDays.map((day) => {
                 const key = format(day, "yyyy-MM-dd");
@@ -121,7 +120,7 @@ export function MonthView({ selectedDate, onChangeDate, onDayClick }: MonthViewP
                 );
               })}
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
         <SummaryCard

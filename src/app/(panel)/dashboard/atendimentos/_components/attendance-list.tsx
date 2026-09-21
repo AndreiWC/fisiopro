@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import type { AppointmentStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -128,7 +127,7 @@ export function AttendanceList({ organizationId }: AttendanceListProps) {
             </p>
           )
         ) : (
-          <ScrollArea className="lg:h-100">
+          <div className="overflow-y-auto lg:h-100">
             <ul className="divide-y divide-border">
               {appointments.map((appointment) => {
                 const meta = STATUS_META[appointment.status];
@@ -198,6 +197,7 @@ export function AttendanceList({ organizationId }: AttendanceListProps) {
                     <Button
                       variant="ghost"
                       size="icon-sm"
+                      className="hidden shrink-0 sm:inline-flex"
                       onClick={() => setSelectedAppointment(appointment)}
                     >
                       <Eye className="h-4 w-4" />
@@ -206,7 +206,7 @@ export function AttendanceList({ organizationId }: AttendanceListProps) {
                 );
               })}
             </ul>
-          </ScrollArea>
+          </div>
         )}
       </div>
     </div>

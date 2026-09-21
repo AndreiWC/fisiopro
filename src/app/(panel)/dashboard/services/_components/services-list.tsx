@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,16 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { ClipboardList, Clock, Pencil, Plus, Trash } from "lucide-react";
+import {
+  ChevronRight,
+  ClipboardList,
+  Clock,
+  LayoutGrid,
+  List,
+  Pencil,
+  Plus,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { DialogService } from "./dialog-service";
 import { Service } from "@prisma/client";
 import { formatvalue } from "@/utils/formatValue";
@@ -21,9 +30,25 @@ interface ServicesListProps {
   permissions: ResultPermissionsProps;
 }
 
+type ViewMode = "list" | "cards";
+const VIEW_STORAGE_KEY = "encaixa:services-view";
+
 export function ServicesList({ services, permissions }: ServicesListProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<null | Service>(null);
+  const [view, setView] = useState<ViewMode>("list");
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
+    if (stored === "list" || stored === "cards") {
+      setView(stored);
+    }
+  }, []);
+
+  function changeView(next: ViewMode) {
+    setView(next);
+    window.localStorage.setItem(VIEW_STORAGE_KEY, next);
+  }
 
   const servicesList = permissions.hasPermission
     ? services
@@ -33,9 +58,10 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
     const response = await deleteServiceAction({ serviceId: serviceId });
     if (response.error) {
       toast.error(response.error);
-      return;
+      return false;
     }
     toast.success("Serviço deletado com sucesso!");
+    return true;
   }
 
   function handleEditService(service: Service) {
@@ -53,22 +79,69 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
         }
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          {servicesList.length === 0
-            ? "Nenhum serviço cadastrado"
-            : `${servicesList.length} ${servicesList.length === 1 ? "serviço" : "serviços"}`}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            {servicesList.length === 0
+              ? "Nenhum serviço cadastrado"
+              : `${servicesList.length} ${servicesList.length === 1 ? "serviço" : "serviços"}`}
+          </p>
+
+          {servicesList.length > 0 && (
+            <div className="flex rounded-full border border-border bg-background p-1">
+              <button
+                type="button"
+                onClick={() => changeView("list")}
+                aria-label="Ver como lista"
+                aria-pressed={view === "list"}
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
+                  view === "list"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => changeView("cards")}
+                aria-label="Ver como cartões"
+                aria-pressed={view === "cards"}
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
+                  view === "cards"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
 
         {permissions.hasPermission && (
           <DialogTrigger asChild>
-            <Button>
+            <Button className="hidden gap-2 md:inline-flex">
               <Plus className="h-4 w-4" />
               Novo serviço
             </Button>
           </DialogTrigger>
         )}
       </div>
+
+      {permissions.hasPermission && (
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            aria-label="Novo serviço"
+            className="fixed right-4 bottom-20 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:hidden"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+        </DialogTrigger>
+      )}
 
       <DialogContent
         onInteractOutside={(e) => {
@@ -90,6 +163,17 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
                   price: formatvalue(editingService.price.toString()),
                   hours: Math.floor(editingService.duration / 60).toString(),
                   minutes: (editingService.duration % 60).toString(),
+                }
+              : undefined
+          }
+          onDelete={
+            editingService
+              ? async () => {
+                  const ok = await handleDeleteService(editingService.id);
+                  if (ok) {
+                    setIsDialogOpen(false);
+                    setEditingService(null);
+                  }
                 }
               : undefined
           }
@@ -116,6 +200,41 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
             </DialogTrigger>
           )}
         </div>
+      ) : view === "list" ? (
+        <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+          {servicesList.map((service) => {
+            const perMinuteCents =
+              service.duration > 0 ? Math.round(service.price / service.duration) : 0;
+
+            return (
+              <li key={service.id}>
+                <button
+                  type="button"
+                  onClick={() => handleEditService(service)}
+                  aria-label={`Editar ${service.name}`}
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-secondary/40"
+                >
+                  <div className="min-w-0">
+                    <h3 className="font-display truncate font-semibold text-foreground">
+                      {service.name}
+                    </h3>
+                    <p className="mt-1 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      {service.duration} min · {formatvalue(String(perMinuteCents))}/min
+                    </p>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-3">
+                    <p className="font-mono text-lg font-semibold tabular-nums text-primary">
+                      {formatvalue(service.price.toString())}
+                    </p>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  </div>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       ) : (
         <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {servicesList.map((service) => {
@@ -123,41 +242,33 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
               service.duration > 0 ? Math.round(service.price / service.duration) : 0;
 
             return (
-              <li
-                key={service.id}
-                className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="min-w-0 truncate font-semibold text-foreground">
-                    {service.name}
-                  </h3>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleEditService(service)}
-                      aria-label={`Editar ${service.name}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteService(service.id)}
-                      aria-label={`Excluir ${service.name}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
+              <li key={service.id}>
+                <button
+                  type="button"
+                  onClick={() => handleEditService(service)}
+                  aria-label={`Editar ${service.name}`}
+                  className="flex h-full w-full flex-col items-stretch gap-3 rounded-2xl border border-border bg-card p-5 text-left transition-colors hover:border-primary/40 hover:bg-secondary/30"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-display min-w-0 truncate font-semibold text-foreground">
+                      {service.name}
+                    </h3>
+                    <Pencil
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50"
+                    />
                   </div>
-                </div>
 
-                <p className="mt-3 font-mono text-2xl font-semibold tabular-nums text-primary">
-                  {formatvalue(service.price.toString())}
-                </p>
-                <p className="mt-1 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
-                  <Clock className="h-3.5 w-3.5" />
-                  {service.duration} min · {formatvalue(String(perMinuteCents))}/min
-                </p>
+                  <div>
+                    <p className="font-mono text-xl font-semibold tabular-nums text-primary">
+                      {formatvalue(service.price.toString())}
+                    </p>
+                    <p className="mt-1 flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      {service.duration} min · {formatvalue(String(perMinuteCents))}/min
+                    </p>
+                  </div>
+                </button>
               </li>
             );
           })}
