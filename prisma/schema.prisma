@@ -8,7 +8,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -28,6 +27,8 @@ model Appointments {
 
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id])
+
+  clinicalRecords ClinicalRecord[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,7 +67,8 @@ model Customer {
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
 
-  appointments Appointments[]
+  appointments    Appointments[]
+  clinicalRecords ClinicalRecord[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,6 +89,30 @@ enum CustomerStatus {
   AGUARDANDO
   EM_TRATAMENTO
   ALTA
+}
+
+model ClinicalRecord {
+  id          String   @id @default(cuid())
+  note        String   @db.Text
+  sessionDate DateTime
+  images      String[] @default([])
+
+  deletedAt DateTime?
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  appointmentId String?
+  appointment   Appointments? @relation(fields: [appointmentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Reminder {
@@ -161,24 +187,25 @@ model Membership {
 }
 
 model Organization {
-  id                       String    @id @default(cuid())
+  id                       String   @id @default(cuid())
   name                     String?
   image                    String?
-  address                  String?   @default("")
-  phone                    String?   @default("")
-  status                   Boolean   @default(true)
+  address                  String?  @default("")
+  phone                    String?  @default("")
+  status                   Boolean  @default(true)
   segment                  Segment?
   professionalRegistration String?
   timezone                 String?
-  times                    String[]  @default([])
+  times                    String[] @default([])
   stripe_customer_id       String?
 
-  memberships  Membership[]
-  subscription Subscription?
-  services     Service[]
-  reminders    Reminder[]
-  customers    Customer[]
-  appointments Appointments[]
+  memberships     Membership[]
+  subscription    Subscription?
+  services        Service[]
+  reminders       Reminder[]
+  customers       Customer[]
+  appointments    Appointments[]
+  clinicalRecords ClinicalRecord[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -192,12 +219,13 @@ model User {
   image         String?
   phone         String?
 
-  memberships    Membership[]
-  patientProfile PatientProfile?
-  customers      Customer[]
-  accounts       Account[]
-  sessions       Session[]
-  Authenticator  Authenticator[]
+  memberships     Membership[]
+  patientProfile  PatientProfile?
+  customers       Customer[]
+  accounts        Account[]
+  sessions        Session[]
+  Authenticator   Authenticator[]
+  clinicalRecords ClinicalRecord[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
