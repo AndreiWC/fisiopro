@@ -1,6 +1,7 @@
 export type PlanDetailsProps = {
   maxServices: number;
   maxCustomer: number;
+  maxClinicalRecords: number | null;
 };
 export type PlansProps = {
   BASIC: PlanDetailsProps;
@@ -10,10 +11,12 @@ export const PLANS: PlansProps = {
   BASIC: {
     maxServices: 5,
     maxCustomer: 30,
+    maxClinicalRecords: 100,
   },
   PROFESSIONAL: {
     maxServices: 10,
     maxCustomer: 60,
+    maxClinicalRecords: null,
   },
 };
 
@@ -28,6 +31,7 @@ export const subscriptionPlans = [
     features: [
       `Até ${PLANS.BASIC.maxServices} serviços cadastrados`,
       `Até ${PLANS.BASIC.maxCustomer} clientes cadastrados`,
+      `Até ${PLANS.BASIC.maxClinicalRecords} registros de prontuário`,
       "Acesso ao painel de controle para gerenciar agendamentos",
       "Suporte por e-mail para dúvidas e problemas",
       "Acesso a atualizações e melhorias do sistema",
@@ -44,6 +48,7 @@ export const subscriptionPlans = [
     features: [
       `Até ${PLANS.PROFESSIONAL.maxServices} serviços cadastrados`,
       `Até ${PLANS.PROFESSIONAL.maxCustomer} clientes cadastrados`,
+      "Prontuário de pacientes ilimitado",
       "Acesso ao painel de controle para gerenciar agendamentos",
       "Suporte prioritário para dúvidas e problemas",
       "Acesso a atualizações e melhorias do sistema",

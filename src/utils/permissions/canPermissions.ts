@@ -1,11 +1,12 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { canCreateService } from "./canCreateService";
+import { canCreateClinicalRecord } from "./canCreateClinicalRecord";
 import { PlanDetailsInfo } from "./get-plans";
 import { requireActiveOrganization } from "@/lib/organization";
 
 export type PlanType = "BASIC" | "PROFESSIONAL" | "TRIAL" | "EXPIRED";
-type TypeCheck = "service";
+type TypeCheck = "service" | "clinicalRecord";
 
 export interface ResultPermissionsProps {
   hasPermission: boolean;
@@ -31,6 +32,13 @@ export async function canPermissions({
     case "service":
       const permission = await canCreateService(subscription, organization);
       return permission;
+
+    case "clinicalRecord":
+      const clinicalRecordPermission = await canCreateClinicalRecord(
+        subscription,
+        organization,
+      );
+      return clinicalRecordPermission;
 
     default:
       return {
