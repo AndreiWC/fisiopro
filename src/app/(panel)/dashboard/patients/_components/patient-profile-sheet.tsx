@@ -119,6 +119,11 @@ export function PatientProfileSheet({
             </div>
 
             <SheetFooter className="border-t border-border p-5">
+              <Button asChild size="lg" variant="outline" className="w-full">
+                <Link href={`/dashboard/patients/${patient.id}/prontuario`}>
+                  Ver prontuário completo
+                </Link>
+              </Button>
               <Button asChild size="lg" className="w-full">
                 <Link href={`/clinica/${organizationId}`} target="_blank">
                   Agendar novo atendimento
