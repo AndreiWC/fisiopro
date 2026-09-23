@@ -12,7 +12,7 @@ const formSchema = z.object({
   note: z.string().min(1, { message: "Descreva o que ocorreu na sessão" }),
   sessionDate: z.string().min(1, { message: "Selecione a data da sessão" }),
   images: z
-    .array(z.string())
+    .array(z.string().url().startsWith("https://res.cloudinary.com/"))
     .max(3, { message: "No máximo 3 imagens por anotação" }),
 });
 

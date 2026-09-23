@@ -35,7 +35,7 @@ export const POST = async (request: Request) => {
       .upload_stream(
         {
           tags: [`${userId}`],
-          public_id: file.name,
+          folder: `clinics/${userId}`,
         },
         function (error, result) {
           if (error) {

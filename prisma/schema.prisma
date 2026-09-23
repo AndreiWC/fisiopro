@@ -113,6 +113,9 @@ model ClinicalRecord {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([organizationId, deletedAt])
+  @@index([customerId, deletedAt])
 }
 
 model Reminder {
