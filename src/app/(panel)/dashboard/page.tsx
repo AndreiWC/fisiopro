@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { ButtonCopyLink } from "./_components/button-copy-link";
+import { ButtonShareLink } from "./_components/button-share-link";
 import { Reminders } from "./_components/reminder/reminders";
 import { Agenda } from "./_components/agenda/agenda";
 import { CalendarCard } from "./_components/calendar-card";
@@ -60,15 +60,15 @@ export default async function Dashboard() {
 
   return (
     <main>
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-3 md:items-end">
+        <div className="min-w-0">
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             Olá, {firstName(session.user?.name) || "profissional"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">{todayLabel}</p>
         </div>
 
-        <ButtonCopyLink organizationId={organization.id} />
+        <ButtonShareLink organizationId={organization.id} />
       </div>
 
       {subscription?.subscriptionStatus === "EXPIRED" && (

@@ -7,20 +7,22 @@ interface EmptySlotRowProps {
   onClick: () => void;
 }
 
+/** Horário livre: só o horário e um traço pontilhado, para não competir com os agendamentos. */
 export function EmptySlotRow({ time, onClick }: EmptySlotRowProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group flex w-full items-center gap-3 border-t py-3 text-left last:border-b"
+      aria-label={`Adicionar agendamento às ${time}`}
+      className="group flex min-h-11 w-full items-center gap-3 text-left"
     >
-      <div className="w-14 shrink-0 font-mono text-sm font-semibold tabular-nums text-muted-foreground">
+      <span className="w-12 shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
         {time}
-      </div>
-      <div className="flex flex-1 items-center gap-1.5 text-sm text-muted-foreground group-hover:text-primary">
-        <Plus className="h-3.5 w-3.5" />
-        Adicionar agendamento
-      </div>
+      </span>
+      <span className="flex flex-1 items-center gap-2">
+        <span className="flex-1 border-t border-dashed border-border transition-colors group-hover:border-primary/50" />
+        <Plus className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-colors group-hover:text-primary" />
+      </span>
     </button>
   );
 }

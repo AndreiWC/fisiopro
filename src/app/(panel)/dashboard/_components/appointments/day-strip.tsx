@@ -104,7 +104,9 @@ export function DayStrip() {
   }
 
   function scrollByPage(direction: 1 | -1) {
-    scrollerRef.current?.scrollBy({ left: direction * 320, behavior: "smooth" });
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * el.clientWidth, behavior: "smooth" });
   }
 
   function selectDate(date: Date) {
@@ -115,11 +117,11 @@ export function DayStrip() {
 
   return (
     <div className="w-full min-w-0">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => scrollByPage(-1)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border hover:bg-secondary"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card hover:bg-secondary"
           aria-label="Dias anteriores"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -141,10 +143,12 @@ export function DayStrip() {
                 }}
                 type="button"
                 onClick={() => selectDate(day)}
+                aria-pressed={isActive}
+                aria-current={isToday(day) ? "date" : undefined}
                 className={cn(
-                  "flex shrink-0 snap-start flex-col items-center rounded-xl border px-3.5 py-2 transition-colors",
+                  "flex w-[calc((100%-2rem)/5)] shrink-0 snap-center flex-col items-center rounded-2xl border py-2.5 transition-colors sm:w-[4.5rem]",
                   isActive
-                    ? "border-primary bg-primary text-primary-foreground"
+                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
                     : "border-border bg-card text-foreground hover:bg-secondary",
                 )}
               >
@@ -156,12 +160,19 @@ export function DayStrip() {
                 >
                   {format(day, "EEE", { locale: ptBR }).replace(".", "")}
                 </span>
-                <span className="text-base font-semibold tabular-nums">
+                <span className="text-lg leading-tight font-semibold tabular-nums">
                   {format(day, "dd")}
                 </span>
-                {isToday(day) && !isActive && (
-                  <span className="mt-0.5 h-1 w-1 rounded-full bg-primary" />
-                )}
+                <span
+                  className={cn(
+                    "mt-0.5 h-1 w-1 rounded-full",
+                    isToday(day)
+                      ? isActive
+                        ? "bg-primary-foreground"
+                        : "bg-primary"
+                      : "bg-transparent",
+                  )}
+                />
               </button>
             );
           })}
@@ -170,7 +181,7 @@ export function DayStrip() {
         <button
           type="button"
           onClick={() => scrollByPage(1)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border hover:bg-secondary"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card hover:bg-secondary"
           aria-label="Próximos dias"
         >
           <ChevronRight className="h-4 w-4" />

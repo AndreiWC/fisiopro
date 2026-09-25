@@ -1,5 +1,8 @@
 import type { AppointmentStatus } from "@prisma/client";
 
+/** Agendamentos que ainda aguardam ser fechados (concluídos ou marcados como falta). */
+export const OPEN_APPOINTMENT_STATUSES: AppointmentStatus[] = ["CONFIRMED", "IN_PROGRESS"];
+
 export const APPOINTMENT_STATUS_META: Record<
   AppointmentStatus,
   { label: string; className: string }

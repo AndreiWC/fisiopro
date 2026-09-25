@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,16 +8,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import {
-  ChevronRight,
-  ClipboardList,
-  Clock,
-  LayoutGrid,
-  List,
-  Pencil,
-  Plus,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronRight, ClipboardList, Clock, Pencil, Plus } from "lucide-react";
+import { ViewModeToggle, useViewMode } from "@/components/view-mode-toggle";
 import { DialogService } from "./dialog-service";
 import { Service } from "@prisma/client";
 import { formatvalue } from "@/utils/formatValue";
@@ -30,25 +22,10 @@ interface ServicesListProps {
   permissions: ResultPermissionsProps;
 }
 
-type ViewMode = "list" | "cards";
-const VIEW_STORAGE_KEY = "encaixa:services-view";
-
 export function ServicesList({ services, permissions }: ServicesListProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<null | Service>(null);
-  const [view, setView] = useState<ViewMode>("list");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
-    if (stored === "list" || stored === "cards") {
-      setView(stored);
-    }
-  }, []);
-
-  function changeView(next: ViewMode) {
-    setView(next);
-    window.localStorage.setItem(VIEW_STORAGE_KEY, next);
-  }
+  const [view, changeView] = useViewMode("encaixa:services-view", "list");
 
   const servicesList = permissions.hasPermission
     ? services
@@ -87,38 +64,7 @@ export function ServicesList({ services, permissions }: ServicesListProps) {
               : `${servicesList.length} ${servicesList.length === 1 ? "serviço" : "serviços"}`}
           </p>
 
-          {servicesList.length > 0 && (
-            <div className="flex rounded-full border border-border bg-background p-1">
-              <button
-                type="button"
-                onClick={() => changeView("list")}
-                aria-label="Ver como lista"
-                aria-pressed={view === "list"}
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
-                  view === "list"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <List className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => changeView("cards")}
-                aria-label="Ver como cartões"
-                aria-pressed={view === "cards"}
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
-                  view === "cards"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+          {servicesList.length > 0 && <ViewModeToggle view={view} onChange={changeView} />}
         </div>
 
         {permissions.hasPermission && (

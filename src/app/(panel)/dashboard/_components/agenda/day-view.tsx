@@ -5,24 +5,19 @@ import { useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import type { Prisma, AppointmentStatus } from "@prisma/client";
-import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
 import { toast } from "sonner";
 import { updateAppointmentStatus } from "../../_actions/update-appointment-status";
 import { DialogAppointment } from "../appointments/dialog-appointment";
 import { Dialog } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { formatvalue } from "@/utils/formatValue";
 import { APPOINTMENT_STATUS_META } from "@/utils/appointment-status";
-import { buildOccupantMap, computeOccupancyPercent } from "@/utils/slot-occupancy";
+import {
+  buildOccupantMap,
+  computeOccupancyPercent,
+  expandAppointmentSlots,
+} from "@/utils/slot-occupancy";
 import { DayStrip } from "../appointments/day-strip";
+import { AppointmentBlock } from "./appointment-block";
 import { EmptySlotRow } from "./empty-slot-row";
 import { EmptyState } from "./empty-state";
 import { SummaryCard } from "./summary-card";
@@ -85,12 +80,35 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
     };
   }, [appointments, allAppointments, occupantMap, times.length]);
 
+  // Uma linha por horário livre ou por agendamento (que ocupa vários horários seguidos).
+  const rows = useMemo(() => {
+    const result: (
+      | { type: "free"; time: string }
+      | { type: "appointment"; appointment: AppointmentWithService; slots: number }
+    )[] = [];
+
+    for (const slot of times) {
+      const occupant = occupantMap.get(slot);
+      if (!occupant) {
+        result.push({ type: "free", time: slot });
+      } else if (occupant.time === slot) {
+        result.push({
+          type: "appointment",
+          appointment: occupant,
+          slots: expandAppointmentSlots(occupant, times).length,
+        });
+      }
+    }
+    return result;
+  }, [times, occupantMap]);
+
   async function handleStatusChange(appointmentId: string, status: AppointmentStatus) {
     const response = await updateAppointmentStatus({ appointmentId, status });
     if (response.error) {
       toast.error(response.error);
       return;
     }
+    toast.success("Status atualizado!");
     queryClient.invalidateQueries({ queryKey: ["get-appointments"] });
     queryClient.invalidateQueries({ queryKey: ["get-week-appointments"] });
     queryClient.invalidateQueries({ queryKey: ["get-month-appointments-summary"] });
@@ -103,7 +121,15 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
         open={!!selectedAppointment}
         onOpenChange={(open) => !open && setSelectedAppointment(null)}
       >
-        {selectedAppointment && <DialogAppointment appointment={selectedAppointment} />}
+        {selectedAppointment && (
+          <DialogAppointment
+            appointment={selectedAppointment}
+            onStatusChange={async (status) => {
+              await handleStatusChange(selectedAppointment.id, status);
+              setSelectedAppointment(null);
+            }}
+          />
+        )}
       </Dialog>
 
       <DayStrip />
@@ -119,62 +145,28 @@ export function DayView({ times, onSlotClick }: DayViewProps) {
               onNewAppointment={() => onSlotClick()}
             />
           ) : (
-            <div className="h-[calc(100vh-30rem)] overflow-y-auto pr-4 lg:h-84">
-              {times.map((slot) => {
-                const occupant = occupantMap.get(slot);
-
-                if (occupant) {
-                  const meta = STATUS_META[occupant.status];
-                  const isSlotStart = occupant.time === slot;
-                  if (!isSlotStart) return null;
-
-                  return (
-                    <div key={slot} className="flex items-center gap-3 border-t py-3 last:border-b">
-                      <div className="w-14 shrink-0 font-mono text-sm font-semibold tabular-nums">
-                        {slot}
-                      </div>
-                      <div className="min-w-0 flex-1 text-sm">
-                        <div className="truncate font-semibold">{occupant.customer.name}</div>
-                        <div className="truncate text-sm text-muted-foreground">
-                          {occupant.service.name}
-                        </div>
-                      </div>
-                      <Select
-                        value={occupant.status}
-                        onValueChange={(value) =>
-                          handleStatusChange(occupant.id, value as AppointmentStatus)
-                        }
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            "h-7 w-fit shrink-0 gap-1 rounded-full px-2.5 text-xs font-medium shadow-none",
-                            meta.className,
-                          )}
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent align="end">
-                          {(Object.keys(STATUS_META) as AppointmentStatus[]).map((status) => (
-                            <SelectItem key={status} value={status}>
-                              {STATUS_META[status].label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="hidden shrink-0 sm:inline-flex"
-                        onClick={() => setSelectedAppointment(occupant)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                }
-
-                return <EmptySlotRow key={slot} time={slot} onClick={() => onSlotClick(slot)} />;
-              })}
+            <div className="flex flex-col lg:h-84 lg:overflow-y-auto lg:pr-3 lg:[scrollbar-color:var(--border)_transparent] lg:[scrollbar-width:thin]">
+              {rows.map((row) =>
+                row.type === "free" ? (
+                  <EmptySlotRow
+                    key={row.time}
+                    time={row.time}
+                    onClick={() => onSlotClick(row.time)}
+                  />
+                ) : (
+                  <div key={row.appointment.id} className="flex gap-3 py-1.5">
+                    <span className="w-12 shrink-0 pt-3.5 font-mono text-sm font-semibold tabular-nums text-foreground">
+                      {row.appointment.time}
+                    </span>
+                    <AppointmentBlock
+                      appointment={row.appointment}
+                      slots={row.slots}
+                      onOpen={setSelectedAppointment}
+                      onChangeStatus={handleStatusChange}
+                    />
+                  </div>
+                ),
+              )}
             </div>
           )}
         </div>

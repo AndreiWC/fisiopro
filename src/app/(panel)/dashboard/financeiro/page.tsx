@@ -6,8 +6,10 @@ import { isFinancePeriod, type FinancePeriod } from "./_lib/period";
 import { PeriodSelector } from "./_components/period-selector";
 import { KpiHero } from "./_components/kpi-hero";
 import { RevenueChart } from "./_components/revenue-chart";
-import { RevenueByServiceList } from "./_components/revenue-by-service-list";
-import { AppointmentsChart } from "./_components/appointments-chart";
+import { RevenueByServiceChart } from "./_components/revenue-by-service-chart";
+import { StatusChart } from "./_components/status-chart";
+import { WeekdayChart } from "./_components/weekday-chart";
+import { HoursChart } from "./_components/hours-chart";
 import { AttendanceAlert } from "./_components/attendance-alert";
 
 export default async function FinanceiroPage({
@@ -44,12 +46,21 @@ export default async function FinanceiroPage({
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <RevenueChart data={summary.revenueSeries} />
+          <RevenueChart
+            data={summary.revenueSeries}
+            total={summary.revenueTotal}
+            previousTotal={summary.revenuePrevious}
+          />
         </div>
-        <RevenueByServiceList services={summary.revenueByService} />
+        <RevenueByServiceChart services={summary.revenueByService} />
       </div>
 
-      <AppointmentsChart data={summary.appointmentsSeries} />
+      <StatusChart data={summary.statusSeries} />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <WeekdayChart data={summary.weekdayStats} />
+        <HoursChart data={summary.hourStats} />
+      </div>
 
       <AttendanceAlert summary={summary} />
     </main>

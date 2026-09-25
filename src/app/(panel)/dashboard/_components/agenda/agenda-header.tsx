@@ -36,35 +36,44 @@ export function AgendaHeader({
       : capitalizeFirst(format(selectedDate, "MMMM 'de' yyyy", { locale: ptBR }));
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="font-display text-xl font-bold text-foreground sm:text-2xl">Agenda</h1>
-        <p className="text-sm text-muted-foreground">{dateLabel}</p>
-      </div>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <DatePickerButton
+            date={selectedDate}
+            onChange={onChangeDate}
+            align="start"
+            className="h-10 w-10 rounded-full border-transparent bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+          />
+          <div className="min-w-0">
+            <h1 className="font-display text-xl font-bold text-foreground sm:text-2xl">Agenda</h1>
+            <p className="text-sm text-muted-foreground">{dateLabel}</p>
+          </div>
+        </div>
 
-      <div className="flex items-center gap-2">
         <Button className="hidden gap-2 md:inline-flex" onClick={onNewAppointment}>
           <Plus className="h-4 w-4" />
           Novo agendamento
         </Button>
-        <div className="flex rounded-full border border-border bg-background p-1">
-          {(Object.keys(VIEW_LABELS) as AgendaView[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onChangeView(key)}
-              className={cn(
-                "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
-                view === key
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {VIEW_LABELS[key]}
-            </button>
-          ))}
-        </div>
-        <DatePickerButton date={selectedDate} onChange={onChangeDate} />
+      </div>
+
+      <div className="grid grid-cols-3 rounded-full border border-border bg-muted/50 p-1 sm:max-w-sm">
+        {(Object.keys(VIEW_LABELS) as AgendaView[]).map((key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChangeView(key)}
+            aria-pressed={view === key}
+            className={cn(
+              "rounded-full py-2 text-sm font-medium transition-colors",
+              view === key
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {VIEW_LABELS[key]}
+          </button>
+        ))}
       </div>
     </div>
   );

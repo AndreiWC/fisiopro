@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/sheet";
 import { APPOINTMENT_STATUS_META } from "@/utils/appointment-status";
 import { formatvalue } from "@/utils/formatValue";
-import { PATIENT_STATUS_META, patientInitials } from "../_lib/patient-status";
+import { patientInitials } from "../_lib/patient-status";
 import type { Patient } from "../_data-access/get-patients";
+import { PatientStatusBadge } from "./patient-status-badge";
 
 interface PatientProfileSheetProps {
   patient: Patient | null;
@@ -81,14 +82,7 @@ export function PatientProfileSheet({
                     {patient.lastServiceName}
                   </span>
                 )}
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-medium",
-                    PATIENT_STATUS_META[patient.treatmentStatus].className,
-                  )}
-                >
-                  {PATIENT_STATUS_META[patient.treatmentStatus].label}
-                </span>
+                <PatientStatusBadge status={patient.treatmentStatus} />
               </div>
             </SheetHeader>
 
