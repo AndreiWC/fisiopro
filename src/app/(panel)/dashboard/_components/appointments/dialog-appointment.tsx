@@ -8,10 +8,28 @@ import { AppointmentWithService, STATUS_META } from "../agenda/day-view";
 import { format } from "date-fns";
 import { formatvalueToReal } from "@/utils/formatValue";
 import { cn } from "@/lib/utils";
+import { Check, X } from "lucide-react";
+import type { AppointmentStatus } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 interface DialogAppointmentProps {
   appointment: AppointmentWithService;
+  onStatusChange?: (status: AppointmentStatus) => void | Promise<void>;
 }
-export function DialogAppointment({ appointment }: DialogAppointmentProps) {
+export function DialogAppointment({
+  appointment,
+  onStatusChange,
+}: DialogAppointmentProps) {
+  const isOpen =
+    appointment.status === "CONFIRMED" || appointment.status === "IN_PROGRESS";
+
   return (
     <DialogContent>
       <DialogHeader>
@@ -73,6 +91,51 @@ export function DialogAppointment({ appointment }: DialogAppointmentProps) {
           </article>
         )}
       </div>
+
+      {onStatusChange && (
+        <div className="flex flex-col gap-3 border-t border-border pt-4">
+          <p className="text-sm font-semibold">Ações</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {isOpen && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={() => onStatusChange("COMPLETED")}
+                >
+                  <Check className="h-4 w-4" />
+                  Concluir
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => onStatusChange("NO_SHOW")}
+                >
+                  <X className="h-4 w-4" />
+                  Faltou
+                </Button>
+              </>
+            )}
+            <Select
+              value={appointment.status}
+              onValueChange={(value) => onStatusChange(value as AppointmentStatus)}
+            >
+              <SelectTrigger className="w-fit gap-1.5">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {(Object.keys(STATUS_META) as AppointmentStatus[]).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {STATUS_META[status].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
     </DialogContent>
   );
 }

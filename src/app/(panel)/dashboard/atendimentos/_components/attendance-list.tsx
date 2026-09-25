@@ -68,6 +68,9 @@ export function AttendanceList({ organizationId }: AttendanceListProps) {
       toast.error(response.error);
       return;
     }
+    setSelectedAppointment((current) =>
+      current && current.id === appointmentId ? { ...current, status } : current,
+    );
     toast.success("Status atualizado!");
     queryClient.invalidateQueries({ queryKey: ["attendance-list"] });
     queryClient.invalidateQueries({ queryKey: ["get-appointments"] });
@@ -81,7 +84,12 @@ export function AttendanceList({ organizationId }: AttendanceListProps) {
         open={!!selectedAppointment}
         onOpenChange={(open) => !open && setSelectedAppointment(null)}
       >
-        {selectedAppointment && <DialogAppointment appointment={selectedAppointment} />}
+        {selectedAppointment && (
+          <DialogAppointment
+            appointment={selectedAppointment}
+            onStatusChange={(status) => handleStatusChange(selectedAppointment.id, status)}
+          />
+        )}
       </Dialog>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -134,20 +142,27 @@ export function AttendanceList({ organizationId }: AttendanceListProps) {
                 const isOpen = OPEN_STATUSES.includes(appointment.status);
                 return (
                   <li key={appointment.id} className="flex items-center gap-3 py-3">
-                    <div className="w-14 shrink-0">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        {getDateLabel(appointment.AppointmentDate)}
-                      </p>
-                      <p className="font-mono text-sm font-semibold tabular-nums">
-                        {appointment.time}
-                      </p>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">{appointment.customer.name}</p>
-                      <p className="truncate text-sm text-muted-foreground">
-                        {appointment.service.name}
-                      </p>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAppointment(appointment)}
+                      aria-label={`Ver detalhes do agendamento de ${appointment.customer.name}`}
+                      className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left"
+                    >
+                      <div className="w-14 shrink-0">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          {getDateLabel(appointment.AppointmentDate)}
+                        </p>
+                        <p className="font-mono text-sm font-semibold tabular-nums">
+                          {appointment.time}
+                        </p>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{appointment.customer.name}</p>
+                        <p className="truncate text-sm text-muted-foreground">
+                          {appointment.service.name}
+                        </p>
+                      </div>
+                    </button>
                     {isOpen && (
                       <div className="flex shrink-0 items-center gap-1">
                         <Button
