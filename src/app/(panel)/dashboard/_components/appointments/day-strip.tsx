@@ -118,10 +118,11 @@ export function DayStrip() {
   return (
     <div className="w-full min-w-0">
       <div className="flex items-center gap-2">
+        {/* No celular as setas somem: arrastar a faixa já navega e o espaço vai para os dias. */}
         <button
           type="button"
           onClick={() => scrollByPage(-1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card hover:bg-secondary"
+          className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card hover:bg-secondary sm:flex"
           aria-label="Dias anteriores"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -130,7 +131,7 @@ export function DayStrip() {
         <div
           ref={scrollerRef}
           onScroll={handleScroll}
-          className="scrollbar-none flex min-w-0 flex-1 snap-x snap-proximity gap-2 overflow-x-auto scroll-smooth py-0.5"
+          className="scrollbar-none flex min-w-0 flex-1 snap-x snap-proximity gap-1.5 overflow-x-auto scroll-smooth py-0.5 sm:gap-2"
         >
           {days.map((day) => {
             const key = format(day, "yyyy-MM-dd");
@@ -146,7 +147,7 @@ export function DayStrip() {
                 aria-pressed={isActive}
                 aria-current={isToday(day) ? "date" : undefined}
                 className={cn(
-                  "flex w-[calc((100%-2rem)/5)] shrink-0 snap-center flex-col items-center rounded-2xl border py-2.5 transition-colors sm:w-[4.5rem]",
+                  "flex w-[calc((100%-1.5rem)/5)] shrink-0 snap-center flex-col items-center rounded-2xl border py-2 transition-colors sm:w-[4.5rem] sm:py-2.5",
                   isActive
                     ? "border-primary bg-primary text-primary-foreground shadow-sm"
                     : "border-border bg-card text-foreground hover:bg-secondary",
@@ -154,13 +155,14 @@ export function DayStrip() {
               >
                 <span
                   className={cn(
-                    "text-[11px] font-medium uppercase",
+                    "text-[10px] font-medium uppercase sm:text-[11px]",
                     isActive ? "text-primary-foreground/80" : "text-muted-foreground",
                   )}
                 >
-                  {format(day, "EEE", { locale: ptBR }).replace(".", "")}
+                  {/* "EEEEEE" = abreviação curta (seg, ter...); "EEE" em pt-BR devolve o nome inteiro. */}
+                  {format(day, "EEEEEE", { locale: ptBR }).replace(".", "")}
                 </span>
-                <span className="text-lg leading-tight font-semibold tabular-nums">
+                <span className="text-base leading-tight font-semibold tabular-nums sm:text-lg">
                   {format(day, "dd")}
                 </span>
                 <span
@@ -181,7 +183,7 @@ export function DayStrip() {
         <button
           type="button"
           onClick={() => scrollByPage(1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card hover:bg-secondary"
+          className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card hover:bg-secondary sm:flex"
           aria-label="Próximos dias"
         >
           <ChevronRight className="h-4 w-4" />

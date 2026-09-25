@@ -46,7 +46,7 @@ export function WeekMobileList({ days, times, appointmentsByDay, onDayClick }: W
                     isToday(day) && "text-primary",
                   )}
                 >
-                  {format(day, "EEE", { locale: ptBR }).replace(".", "")}
+                  {format(day, "EEEEEE", { locale: ptBR }).replace(".", "")}
                 </p>
                 <p
                   className={cn(

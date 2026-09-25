@@ -49,7 +49,7 @@ export function WeekGrid({
         {days.map((day, d) => {
           const occupancy = computeOccupancyPercent(occupantMaps[d].size, times.length);
           const today = isToday(day);
-          const weekdayLabel = format(day, "EEE", { locale: ptBR }).replace(".", "");
+          const weekdayLabel = format(day, "EEEEEE", { locale: ptBR }).replace(".", "");
           return (
             <div
               key={dayKeys[d]}
